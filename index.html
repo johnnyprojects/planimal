@@ -372,13 +372,61 @@
     .task-star.starred { color: var(--warning); }
     .task-star:hover { color: var(--warning); }
 
+
     .todo-right-empty {
       flex: 1; display: flex;
       align-items: center; justify-content: center;
       color: var(--muted); font-size: 0.88rem;
     }
 
-    .detail-panel { display: flex; flex-direction: column; height: 100%; padding: 1.4rem 1.5rem; }
+    /* Detail panel slide-in */
+    .todo-detail {
+      position: absolute;
+      top: 0; right: 0;
+      height: 100%;
+      width: 22vw;
+      border-left: 1px solid var(--border);
+      background: rgba(10, 28, 16, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transform: translateX(100%);
+      transition: transform 0.35s ease;
+      overflow-y: auto;
+    }
+
+    #todo.detail-open .todo-detail {
+      transform: translateX(0);
+    }
+
+    #todo-section {
+      transition: margin-right 0.35s ease;
+    }
+
+    #todo.detail-open #todo-section {
+      margin-right: 5vw;
+    }
+
+
+
+    .detail-panel {
+      display: flex; flex-direction: column;
+      min-height: 100%; padding: 1.6rem 1.5rem;
+      width: 22vw;
+    }
+
+    .detail-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+    }
+
+    .detail-close {
+      background: none; border: none; color: var(--muted);
+      font-size: 1.1rem; cursor: pointer; padding: 0.2rem 0.4rem;
+      border-radius: 6px; transition: color 0.13s, background 0.13s;
+    }
+
+    .detail-close:hover { color: var(--text); background: var(--surface2); }
 
     .detail-title-input {
       font-size: 1.25rem; font-weight: 600;
@@ -417,10 +465,9 @@
     .step-del {
       background: none; border: none; color: var(--muted);
       cursor: pointer; font-size: 0.72rem; padding: 0;
-      opacity: 0; transition: opacity 0.12s;
+      transition: color 0.12s;
     }
 
-    .step-item:hover .step-del { opacity: 1; }
     .step-del:hover { color: var(--danger); }
 
     .add-step-form { display: flex; gap: 0.4rem; }
@@ -451,54 +498,85 @@
 
     .detail-row:last-child { border-bottom: none; }
 
-    .detail-row label { font-size: 0.83rem; color: var(--muted); flex-shrink: 0; width: 85px; }
+    .detail-row label:not(.toggle) { font-size: 0.83rem; color: var(--muted); flex-shrink: 0; width: 85px; }
 
     .detail-row input[type="date"],
     .detail-row input[type="time"],
-    .detail-row input[type="text"] {
+    .detail-row input[type="text"],
+    .detail-row input[type="url"],
+    .detail-row select {
       flex: 1; background: var(--surface2);
       border: 1.5px solid var(--border); border-radius: 6px;
       padding: 0.32rem 0.55rem; font-size: 0.82rem;
       color: var(--text); outline: none;
     }
 
-    .detail-row input:focus { border-color: var(--accent); }
+    .detail-row select option { background: #1e261e; }
 
-    .toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
-    .toggle input { opacity: 0; width: 0; height: 0; }
+    .detail-row input:focus,
+    .detail-row select:focus { border-color: var(--accent); }
+
+    .detail-notes {
+      display: flex; flex-direction: column; gap: 0.5rem;
+      padding: 0.6rem 0; border-bottom: 1px solid var(--border);
+    }
+
+    .detail-notes label {
+      font-size: 0.83rem; color: var(--muted);
+    }
+
+    .detail-notes textarea {
+      background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: 6px; padding: 0.5rem 0.6rem;
+      font-size: 0.82rem; color: var(--text);
+      resize: vertical; min-height: 90px; outline: none;
+      font-family: inherit; line-height: 1.5;
+      transition: border-color 0.15s;
+    }
+
+    .detail-notes textarea:focus { border-color: var(--accent); }
+
+    .detail-link-open {
+      font-size: 0.75rem; color: var(--accent); text-decoration: none;
+      flex-shrink: 0; opacity: 0.85; transition: opacity 0.14s;
+    }
+    .detail-link-open:hover { opacity: 1; }
+
+    .toggle { position: relative; width: 48px; height: 26px; flex-shrink: 0; cursor: pointer; }
+    .toggle input { opacity: 0; position: absolute; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; }
 
     .toggle-slider {
       position: absolute; inset: 0;
-      background: var(--surface3); border-radius: 20px;
-      cursor: pointer; transition: background 0.18s;
+      background: var(--surface3); border-radius: 26px;
+      transition: background 0.22s, border-color 0.22s;
       border: 1.5px solid var(--border);
+      pointer-events: none;
     }
 
     .toggle-slider::before {
       content: ''; position: absolute;
-      width: 13px; height: 13px;
+      width: 18px; height: 18px;
       background: var(--muted); border-radius: 50%;
-      top: 2px; left: 2px;
-      transition: transform 0.18s, background 0.18s;
+      top: 3px; left: 3px;
+      transition: transform 0.22s ease, background 0.22s;
     }
 
     .toggle input:checked + .toggle-slider { background: var(--accent-glow); border-color: var(--accent); }
-    .toggle input:checked + .toggle-slider::before { transform: translateX(15px); background: var(--accent-light); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(22px); background: var(--accent-light); }
 
     .detail-footer {
-      margin-top: auto; padding-top: 1rem;
+      margin-top: auto; padding: 1rem 0 1.5rem;
       border-top: 1px solid var(--border);
       display: flex; justify-content: flex-end;
     }
 
     .btn-danger {
-      background: none; border: 1.5px solid var(--danger);
-      border-radius: 8px; color: var(--danger);
-      padding: 0.42rem 0.9rem; font-size: 0.82rem;
-      cursor: pointer; transition: all 0.14s;
+      background: none; border: none; color: var(--muted);
+      font-size: 1.1rem; cursor: pointer;
+      transition: color 0.14s; padding: 0.2rem;
     }
 
-    .btn-danger:hover { background: var(--danger); color: #fff; }
+    .btn-danger:hover { color: var(--danger); }
 
     /* ── CALENDAR ────────────────────────────── */
     .cal-nav {
@@ -584,6 +662,18 @@
     }
 
     .btn-full:hover { opacity: 0.8; }
+
+    .btn-my-day {
+      width: 100%; background: none;
+      border: 1.5px solid var(--accent); border-radius: 7px;
+      color: var(--accent); font-size: 0.8rem; font-weight: 500;
+      padding: 0.38rem 0.7rem; cursor: pointer;
+      transition: background 0.14s, color 0.14s;
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+    .btn-my-day:hover { background: var(--accent); color: #fff; }
+    .btn-my-day.active { background: var(--accent-glow); color: var(--accent-light); border-color: var(--accent-light); }
 
     .alarm-item {
       display: flex; align-items: center; gap: 0.9rem;
@@ -687,6 +777,46 @@
 
     .btn-sm:hover { background: var(--accent); border-color: var(--accent); }
 
+    /* ── CONFIRM MODAL ───────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(5,18,10,0.6);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.18s ease;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: rgba(14,36,20,0.97);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1.8rem 2rem;
+      min-width: 280px; max-width: 360px;
+      display: flex; flex-direction: column; gap: 1.1rem;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      transform: translateY(8px);
+      transition: transform 0.18s ease;
+    }
+    .modal-overlay.open .modal-box { transform: translateY(0); }
+    .modal-title { font-size: 1rem; font-weight: 600; color: var(--text); }
+    .modal-body { font-size: 0.86rem; color: var(--muted); line-height: 1.5; }
+    .modal-actions { display: flex; gap: 0.65rem; justify-content: flex-end; }
+    .modal-cancel {
+      background: var(--surface2); border: 1.5px solid var(--border);
+      color: var(--text); border-radius: 7px;
+      padding: 0.42rem 1rem; font-size: 0.84rem; cursor: pointer;
+      transition: border-color 0.13s;
+    }
+    .modal-cancel:hover { border-color: var(--accent); }
+    .modal-confirm {
+      background: var(--danger); border: none; color: #fff;
+      border-radius: 7px; padding: 0.42rem 1rem;
+      font-size: 0.84rem; cursor: pointer; opacity: 0.9;
+      transition: opacity 0.13s;
+    }
+    .modal-confirm:hover { opacity: 1; }
+
     /* ── SHARED ──────────────────────────────── */
     .empty-state { text-align: center; color: var(--muted); padding: 2.2rem 1rem; font-size: 0.86rem; }
 
@@ -758,7 +888,7 @@
     <!-- TO-DO -->
     <section class="section" id="todo">
       <!-- Task area (the todo section) -->
-      <div class="todo-section">
+      <div class="todo-section" id="todo-section">
         <div class="add-task-form">
           <form id="add-task-form">
             <input id="new-task-input" type="text" placeholder="Add a task..." autocomplete="off" />
@@ -775,6 +905,8 @@
         </div>
         <ul class="task-list completed-list" id="completed-list" style="list-style:none;"></ul>
       </div>
+      <!-- Detail panel -->
+      <div class="todo-detail" id="todo-detail"></div>
     </section>
 
     <!-- CALENDAR -->
@@ -868,6 +1000,17 @@
     </section>
 
   </main>
+
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal-box">
+      <div class="modal-title">Delete Task</div>
+      <div class="modal-body" id="modal-body-text"></div>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="modal-cancel-btn">Cancel</button>
+        <button class="modal-confirm" id="modal-confirm-btn">Delete</button>
+      </div>
+    </div>
+  </div>
 
   <script>
   // ================================================================
@@ -984,7 +1127,7 @@
     list = list || state.activeList;
     state.todos.unshift({
       id: Date.now(), text, done: false, starred: false,
-      list, dueDate: '', dueTime: '', alarm: false, category: '', steps: [],
+      list, dueDate: '', dueTime: '', alarm: false, category: '', steps: [], link: '', notes: '',
     });
     save();
     renderTodoList();
@@ -996,14 +1139,14 @@
   }
 
   function deleteTodo(id) {
-    state.todos = state.todos.filter(t => t.id !== id);
-    if (state.selectedTodoId === id) {
-      state.selectedTodoId = null;
-      document.getElementById('todo-right').innerHTML =
-        '<div class="todo-right-empty">Select a task to see details</div>';
-    }
-    save();
-    renderTodoList();
+    const todo = state.todos.find(t => t.id === id);
+    const label = todo ? `"${todo.text}"` : 'this task';
+    showConfirm(`Are you sure you want to delete ${label}?`, () => {
+      state.todos = state.todos.filter(t => t.id !== id);
+      if (state.selectedTodoId === id) closeDetailPanel();
+      save();
+      renderTodoList();
+    });
   }
 
   function renderListTabs() {
@@ -1077,7 +1220,15 @@
     li.appendChild(title);
     li.appendChild(metaWrap);
     li.appendChild(star);
-    li.addEventListener('click', () => { state.selectedTodoId = todo.id; renderTodoList(); });
+    li.addEventListener('click', () => {
+      if (state.selectedTodoId === todo.id) {
+        closeDetailPanel();
+      } else {
+        state.selectedTodoId = todo.id;
+        renderTodoList();
+        openDetailPanel(todo.id);
+      }
+    });
     return li;
   }
 
@@ -1131,14 +1282,36 @@
     caret.classList.toggle('open');
   });
 
+  function openDetailPanel(id) {
+    document.getElementById('todo').classList.add('detail-open');
+    renderDetailPanel(id);
+  }
+
+  function closeDetailPanel() {
+    state.selectedTodoId = null;
+    document.getElementById('todo').classList.remove('detail-open');
+    document.getElementById('todo-detail').innerHTML = '';
+    renderTodoList();
+  }
+
   function renderDetailPanel(id) {
     const todo = state.todos.find(t => t.id === id);
     if (!todo) return;
-    const right = document.getElementById('todo-right');
+    const right = document.getElementById('todo-detail');
     right.innerHTML = '';
 
     const panel = document.createElement('div');
     panel.className = 'detail-panel';
+
+    // Header with close button
+    const header = document.createElement('div');
+    header.className = 'detail-header';
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'detail-close';
+    closeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+    closeBtn.addEventListener('click', closeDetailPanel);
+    header.appendChild(closeBtn);
+    panel.appendChild(header);
 
     // Title
     const titleInput = document.createElement('input');
@@ -1215,6 +1388,37 @@
       detailsSection.appendChild(row);
     }
 
+    const catInp = document.createElement('select');
+    ['', 'Work', 'Projects', 'Appointment', 'School', 'Computer', 'Gym'].forEach(opt => {
+      const o = document.createElement('option');
+      o.value = opt; o.textContent = opt || 'None';
+      if ((todo.category || '') === opt) o.selected = true;
+      catInp.appendChild(o);
+    });
+    catInp.addEventListener('change', () => { todo.category = catInp.value; save(); });
+    addDetailRow('Category', catInp);
+
+    // Add to My Day button
+    const myDayBtn = document.createElement('button');
+    myDayBtn.className = 'btn-my-day' + (todo.dueDate === toDateStr(new Date()) ? ' active' : '');
+    myDayBtn.innerHTML = '<i class="fa-solid fa-sun"></i> ' + (todo.dueDate === toDateStr(new Date()) ? 'Added to My Day' : 'Add to My Day');
+    myDayBtn.addEventListener('click', () => {
+      const today = toDateStr(new Date());
+      if (todo.dueDate === today) {
+        todo.dueDate = '';
+        dueDateInp.value = '';
+        myDayBtn.className = 'btn-my-day';
+        myDayBtn.innerHTML = '<i class="fa-solid fa-sun"></i> Add to My Day';
+      } else {
+        todo.dueDate = today;
+        dueDateInp.value = today;
+        myDayBtn.className = 'btn-my-day active';
+        myDayBtn.innerHTML = '<i class="fa-solid fa-sun"></i> Added to My Day';
+      }
+      save(); renderTodoList(); renderMyDay();
+    });
+    detailsSection.appendChild(myDayBtn);
+
     const dueDateInp = document.createElement('input');
     dueDateInp.type = 'date'; dueDateInp.value = todo.dueDate || '';
     dueDateInp.addEventListener('change', () => {
@@ -1227,12 +1431,6 @@
     dueTimeInp.addEventListener('change', () => { todo.dueTime = dueTimeInp.value; save(); });
     addDetailRow('Due Time', dueTimeInp);
 
-    const catInp = document.createElement('input');
-    catInp.type = 'text'; catInp.value = todo.category || '';
-    catInp.placeholder = 'e.g. Work, Personal...';
-    catInp.addEventListener('change', () => { todo.category = catInp.value.trim(); save(); });
-    addDetailRow('Category', catInp);
-
     // Alarm toggle row
     const alarmRow = document.createElement('div');
     alarmRow.className = 'detail-row';
@@ -1243,12 +1441,51 @@
     alarmRow.appendChild(toggle);
     detailsSection.appendChild(alarmRow);
 
+    // Link row
+    const linkRow = document.createElement('div');
+    linkRow.className = 'detail-row';
+    const linkLbl = document.createElement('label');
+    linkLbl.textContent = 'Link';
+    const linkInp = document.createElement('input');
+    linkInp.type = 'url'; linkInp.value = todo.link || '';
+    linkInp.placeholder = 'https://...';
+    linkInp.addEventListener('change', () => { todo.link = linkInp.value.trim(); save(); updateLinkOpen(); });
+    const linkOpen = document.createElement('a');
+    linkOpen.className = 'detail-link-open';
+    linkOpen.textContent = '↗';
+    linkOpen.target = '_blank';
+    linkOpen.rel = 'noopener noreferrer';
+    function updateLinkOpen() {
+      const v = todo.link || '';
+      linkOpen.href = v;
+      linkOpen.style.display = v ? '' : 'none';
+    }
+    updateLinkOpen();
+    linkRow.appendChild(linkLbl);
+    linkRow.appendChild(linkInp);
+    linkRow.appendChild(linkOpen);
+    detailsSection.appendChild(linkRow);
+
+    // Notes section
+    const notesSection = document.createElement('div');
+    notesSection.className = 'detail-notes';
+    const notesLbl = document.createElement('label');
+    notesLbl.textContent = 'Notes';
+    const notesTA = document.createElement('textarea');
+    notesTA.value = todo.notes || '';
+    notesTA.placeholder = 'Add notes...';
+    notesTA.addEventListener('input', () => { todo.notes = notesTA.value; save(); });
+    notesSection.appendChild(notesLbl);
+    notesSection.appendChild(notesTA);
+    detailsSection.appendChild(notesSection);
+
     // Footer
     const footer = document.createElement('div');
     footer.className = 'detail-footer';
     const delBtn = document.createElement('button');
     delBtn.className = 'btn-danger';
-    delBtn.textContent = 'Delete Task';
+    delBtn.title = 'Delete task';
+    delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
     delBtn.addEventListener('click', () => deleteTodo(todo.id));
     footer.appendChild(delBtn);
 
@@ -1649,8 +1886,9 @@
 
   function formatShortDate(d) {
     if (!d) return '';
-    const [, m, day] = d.split('-');
-    return `${parseInt(m)}/${parseInt(day)}`;
+    const [yr, m, day] = d.split('-');
+    const dow = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(parseInt(yr), parseInt(m)-1, parseInt(day)).getDay()];
+    return `${dow} ${parseInt(m)}/${parseInt(day)}/${yr}`;
   }
 
   function isOverdue(todo) {
@@ -1685,6 +1923,32 @@
   load();
   renderMyDay();
   renderTodoList();
+
+  // ── CONFIRM MODAL ──────────────────────────
+  const modalOverlay = document.getElementById('confirm-modal');
+  const modalBody    = document.getElementById('modal-body-text');
+  const modalConfirm = document.getElementById('modal-confirm-btn');
+  const modalCancel  = document.getElementById('modal-cancel-btn');
+  let _pendingConfirm = null;
+
+  function showConfirm(message, onConfirm) {
+    modalBody.textContent = message;
+    _pendingConfirm = onConfirm;
+    modalOverlay.classList.add('open');
+  }
+
+  function closeConfirm() {
+    modalOverlay.classList.remove('open');
+    _pendingConfirm = null;
+  }
+
+  modalConfirm.addEventListener('click', () => {
+    if (_pendingConfirm) _pendingConfirm();
+    closeConfirm();
+  });
+  modalCancel.addEventListener('click', closeConfirm);
+  modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeConfirm(); });
   </script>
+
 </body>
 </html>

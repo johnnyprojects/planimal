@@ -27,6 +27,7 @@
 
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
+      overflow: hidden;
       background:
         linear-gradient(rgba(5, 18, 10, 0.36), rgba(5, 18, 10, 0.36)),
         url('https://images.unsplash.com/photo-1586640866012-8273df34e593?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')
@@ -200,10 +201,28 @@
 
     /* Task area — the core todo section */
     .todo-section {
-      flex: 1; display: flex; flex-direction: column;
+      flex: 1;
       height: 100vh;
-      padding: 3.5rem 35% 2rem 8rem;
+      padding: 3.5rem 35% 4rem 8rem;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+      transition: scrollbar-color 0.3s;
     }
+
+    .todo-section:hover {
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .todo-section::-webkit-scrollbar { width: 5px; }
+    .todo-section::-webkit-scrollbar-track { background: transparent; }
+    .todo-section::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+    .todo-section:hover::-webkit-scrollbar-thumb { background: var(--border); }
+    .todo-section::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
     .list-tabs {
       display: flex; gap: 0;
@@ -263,7 +282,7 @@
 
     .btn-add:hover { opacity: 0.8; }
 
-    .task-list { overflow-y: auto; padding: 0.35rem 0; }
+    .task-list { padding: 0.35rem 0; }
 
     .task-section-header {
       font-size: 0.82rem; font-weight: 600;

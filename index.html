@@ -3,421 +3,1573 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Todo List</title>
+  <title>Planimal</title>
   <style>
+    html { font-size: 115%; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0f0f13;
-      --surface: #1a1a24;
-      --surface2: #23232f;
-      --border: #2e2e3e;
-      --accent: #7c6af7;
-      --accent-glow: rgba(124, 106, 247, 0.25);
-      --text: #e8e6f0;
-      --muted: #6b6880;
-      --done: #3a3a4e;
-      --done-text: #5a5870;
-      --danger: #e05a6a;
-      --success: #4ecb8d;
+      --bg: #161c16;
+      --surface: #1e261e;
+      --surface2: #252f25;
+      --surface3: #2c382c;
+      --border: #344434;
+      --accent: #5d9e5d;
+      --accent-light: #7ab87a;
+      --accent-glow: rgba(93,158,93,0.18);
+      --text: #dde8dd;
+      --muted: #6e826e;
+      --danger: #c46a6a;
+      --warning: #c49a4a;
+      --sidebar-w: 210px;
     }
 
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
-      background: var(--bg);
+      background:
+        linear-gradient(rgba(14, 20, 14, 0.68), rgba(14, 20, 14, 0.68)),
+        url('https://images.unsplash.com/photo-1586640866012-8273df34e593?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')
+        center / cover fixed;
       color: var(--text);
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem 1rem 4rem;
     }
 
-    h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      margin-bottom: 0.25rem;
-      background: linear-gradient(135deg, #a89cf7, #7c6af7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .subtitle {
-      color: var(--muted);
-      font-size: 0.85rem;
-      margin-bottom: 2rem;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 560px;
-    }
-
-    /* Add task */
-    .add-form {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .add-form input {
-      flex: 1;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .add-form input::placeholder { color: var(--muted); }
-
-    .add-form input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
-
-    .btn-add {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 0.75rem 1.25rem;
-      font-size: 1.4rem;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.1s, opacity 0.2s;
-    }
-
-    .btn-add:hover { opacity: 0.85; }
-    .btn-add:active { transform: scale(0.94); }
-
-    /* Filters */
-    .filters {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .filter-btn {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: 20px;
-      padding: 0.35rem 0.9rem;
-      font-size: 0.8rem;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .filter-btn.active {
-      background: var(--accent-glow);
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    /* Stats */
-    .stats {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .clear-done {
-      background: none;
-      border: none;
-      color: var(--danger);
-      font-size: 0.78rem;
-      cursor: pointer;
-      opacity: 0.7;
-      transition: opacity 0.15s;
-    }
-
-    .clear-done:hover { opacity: 1; }
-
-    /* Todo list */
-    #todo-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .todo-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 0.8rem 1rem;
-      transition: border-color 0.2s, background 0.2s, opacity 0.2s;
-      animation: slide-in 0.18s ease;
-    }
-
-    @keyframes slide-in {
-      from { opacity: 0; transform: translateY(-6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .todo-item:hover { border-color: #3e3e52; }
-
-    .todo-item.done {
-      background: var(--done);
-      border-color: var(--done);
-      opacity: 0.65;
-    }
-
-    /* Checkbox */
-    .check {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
+    /* ── SIDEBAR ─────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
       background: transparent;
-      cursor: pointer;
-      flex-shrink: 0;
       display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: fixed;
+      top: 0; left: 0;
+    }
+
+    .sidebar-logo {
+      padding: 2rem 1.4rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      border-radius: 0 0 12px 0;
+      width: 340px;
+      background: rgba(10, 15, 10, 0.82);
+    }
+
+    .sidebar-logo h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--accent-light);
+      letter-spacing: -0.3px;
+    }
+
+    .sidebar-logo p { font-size: 0.88rem; color: var(--muted); margin-top: 0.3rem; }
+
+    .sidebar-nav {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 2rem 0;
+      border-right: 1px solid var(--border);
+      background: rgba(10, 15, 10, 0.82);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s, border-color 0.15s;
-      font-size: 0.75rem;
-    }
-
-    .todo-item.done .check {
-      background: var(--success);
-      border-color: var(--success);
-      color: #fff;
-    }
-
-    .todo-item:not(.done) .check:hover {
-      border-color: var(--success);
-      background: rgba(78, 203, 141, 0.15);
-    }
-
-    /* Text */
-    .todo-text {
-      flex: 1;
-      font-size: 0.95rem;
-      line-height: 1.4;
+      gap: 0.35rem;
+      width: 100px;
+      height: 100px;
       cursor: pointer;
-      word-break: break-word;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s;
+      user-select: none;
+      color: var(--muted);
     }
 
-    .todo-item.done .todo-text {
-      text-decoration: line-through;
-      color: var(--done-text);
+    .nav-item:hover {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(255,255,255,0.18);
+      color: var(--text);
+      transform: scale(1.04);
     }
 
-    /* Edit input */
-    .edit-input {
+    .nav-item.active {
+      background: rgba(93,158,93,0.18);
+      border-color: rgba(93,158,93,0.5);
+      color: var(--accent-light);
+    }
+
+    .nav-item span:not(.nav-icon) {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .nav-icon { text-align: center; font-size: 1.5rem; flex-shrink: 0; }
+
+    /* ── MAIN ────────────────────────────────── */
+    .main { margin-left: 340px; flex: 1; min-height: 100vh; overflow: auto; }
+
+    .section { display: none; height: 100vh; }
+    .section.active { display: flex; flex-direction: column; }
+
+    .section-header {
+      padding: 1.4rem 2rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .section-title { font-size: 1.45rem; font-weight: 600; }
+    .section-sub { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* ── MY DAY ──────────────────────────────── */
+    #my-day .section-body {
+      padding: 1.4rem 2rem;
+      flex: 1; overflow-y: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.1rem;
+      align-content: start;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.2rem;
+    }
+
+    .card-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .day-task {
+      display: flex; align-items: center; gap: 0.55rem;
+      padding: 0.38rem 0;
+      font-size: 0.88rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .day-task:last-child { border-bottom: none; }
+    .day-task.done .dt-text { text-decoration: line-through; color: var(--muted); }
+
+    .dt-check {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.62rem;
+      transition: all 0.14s;
+    }
+
+    .day-task.done .dt-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* ── TO-DO ───────────────────────────────── */
+    #todo { flex-direction: row !important; }
+
+    .todo-left {
+      width: 310px; flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      height: 100vh;
+    }
+
+    .todo-right { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
+
+    .list-tabs {
+      display: flex; gap: 0;
+      padding: 0.65rem 0.9rem 0;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .list-tab {
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem; cursor: pointer;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+      white-space: nowrap; transition: all 0.13s;
+    }
+
+    .list-tab.active { color: var(--accent-light); border-bottom-color: var(--accent); }
+    .list-tab:hover:not(.active) { color: var(--text); }
+
+    .btn-new-list {
+      padding: 0.35rem 0.6rem;
+      font-size: 0.8rem; color: var(--muted);
+      cursor: pointer; background: none; border: none;
+      border-bottom: 2px solid transparent; white-space: nowrap;
+    }
+
+    .btn-new-list:hover { color: var(--accent-light); }
+
+    .add-task-form {
+      padding: 0.8rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .add-task-form form { display: flex; gap: 0.45rem; }
+
+    .add-task-form input {
       flex: 1;
       background: var(--surface2);
-      border: 1.5px solid var(--accent);
-      border-radius: 6px;
-      padding: 0.25rem 0.5rem;
-      font-size: 0.95rem;
-      color: var(--text);
-      outline: none;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 0.55rem 0.8rem;
+      font-size: 0.86rem;
+      color: var(--text); outline: none;
+      transition: border-color 0.18s;
     }
 
-    /* Delete */
-    .btn-del {
-      background: none;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 0.1rem 0.3rem;
-      border-radius: 6px;
-      opacity: 0;
-      transition: opacity 0.15s, color 0.15s;
+    .add-task-form input:focus { border-color: var(--accent); }
+
+    .btn-add {
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 8px;
+      padding: 0.55rem 1rem; font-size: 1.1rem;
+      cursor: pointer; transition: opacity 0.14s;
     }
 
-    .todo-item:hover .btn-del { opacity: 1; }
-    .btn-del:hover { color: var(--danger); }
+    .btn-add:hover { opacity: 0.8; }
 
-    /* Empty state */
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      padding: 3rem 1rem;
-      font-size: 0.9rem;
+    .task-list { flex: 1; overflow-y: auto; padding: 0.35rem 0; }
+
+    .task-item {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.6rem 0.9rem;
+      cursor: pointer; transition: background 0.11s;
+      border-left: 3px solid transparent;
     }
 
-    .empty span { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
+    .task-item:hover { background: var(--surface); }
+    .task-item.selected { background: var(--surface2); border-left-color: var(--accent); }
+    .task-item.done .task-title-text { text-decoration: line-through; color: var(--muted); }
+
+    .task-check {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.68rem; cursor: pointer;
+      transition: all 0.14s;
+    }
+
+    .task-item.done .task-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .task-check:hover { border-color: var(--accent); }
+
+    .task-title-text { flex: 1; font-size: 0.88rem; line-height: 1.35; }
+
+    .task-due-badge { font-size: 0.67rem; color: var(--muted); }
+    .task-due-badge.overdue { color: var(--danger); }
+
+    .task-star {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); font-size: 0.88rem; padding: 0;
+      transition: color 0.13s; flex-shrink: 0;
+    }
+
+    .task-star.starred { color: var(--warning); }
+    .task-star:hover { color: var(--warning); }
+
+    .todo-right-empty {
+      flex: 1; display: flex;
+      align-items: center; justify-content: center;
+      color: var(--muted); font-size: 0.88rem;
+    }
+
+    .detail-panel { display: flex; flex-direction: column; height: 100%; padding: 1.4rem 1.5rem; }
+
+    .detail-title-input {
+      font-size: 1.25rem; font-weight: 600;
+      background: none; border: none; color: var(--text);
+      outline: none; width: 100%;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.7rem; margin-bottom: 1.15rem;
+      transition: border-color 0.18s;
+    }
+
+    .detail-title-input:focus { border-bottom-color: var(--accent); }
+
+    .detail-section { margin-bottom: 1.15rem; }
+
+    .detail-label {
+      font-size: 0.7rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.6px;
+      color: var(--muted); margin-bottom: 0.45rem;
+    }
+
+    .steps-list { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.45rem; }
+
+    .step-item { display: flex; align-items: center; gap: 0.45rem; font-size: 0.84rem; }
+
+    .step-check {
+      width: 18px; height: 18px; border-radius: 3px;
+      border: 1.5px solid var(--border); cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.58rem; transition: all 0.12s;
+    }
+
+    .step-item.done .step-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .step-item.done .step-text { text-decoration: line-through; color: var(--muted); }
+    .step-text { flex: 1; }
+
+    .step-del {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 0.72rem; padding: 0;
+      opacity: 0; transition: opacity 0.12s;
+    }
+
+    .step-item:hover .step-del { opacity: 1; }
+    .step-del:hover { color: var(--danger); }
+
+    .add-step-form { display: flex; gap: 0.4rem; }
+
+    .add-step-form input {
+      flex: 1; background: var(--surface2);
+      border: 1.5px solid var(--border); border-radius: 6px;
+      padding: 0.42rem 0.65rem; font-size: 0.82rem;
+      color: var(--text); outline: none;
+    }
+
+    .add-step-form input:focus { border-color: var(--accent); }
+
+    .add-step-form button {
+      background: var(--surface3); border: 1.5px solid var(--border);
+      border-radius: 6px; color: var(--text); cursor: pointer;
+      padding: 0.42rem 0.7rem; font-size: 0.8rem;
+      transition: background 0.12s, border-color 0.12s;
+    }
+
+    .add-step-form button:hover { background: var(--accent); border-color: var(--accent); }
+
+    .detail-row {
+      display: flex; align-items: center; gap: 0.7rem;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-row:last-child { border-bottom: none; }
+
+    .detail-row label { font-size: 0.83rem; color: var(--muted); flex-shrink: 0; width: 85px; }
+
+    .detail-row input[type="date"],
+    .detail-row input[type="time"],
+    .detail-row input[type="text"] {
+      flex: 1; background: var(--surface2);
+      border: 1.5px solid var(--border); border-radius: 6px;
+      padding: 0.32rem 0.55rem; font-size: 0.82rem;
+      color: var(--text); outline: none;
+    }
+
+    .detail-row input:focus { border-color: var(--accent); }
+
+    .toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-slider {
+      position: absolute; inset: 0;
+      background: var(--surface3); border-radius: 20px;
+      cursor: pointer; transition: background 0.18s;
+      border: 1.5px solid var(--border);
+    }
+
+    .toggle-slider::before {
+      content: ''; position: absolute;
+      width: 13px; height: 13px;
+      background: var(--muted); border-radius: 50%;
+      top: 2px; left: 2px;
+      transition: transform 0.18s, background 0.18s;
+    }
+
+    .toggle input:checked + .toggle-slider { background: var(--accent-glow); border-color: var(--accent); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(15px); background: var(--accent-light); }
+
+    .detail-footer {
+      margin-top: auto; padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end;
+    }
+
+    .btn-danger {
+      background: none; border: 1.5px solid var(--danger);
+      border-radius: 8px; color: var(--danger);
+      padding: 0.42rem 0.9rem; font-size: 0.82rem;
+      cursor: pointer; transition: all 0.14s;
+    }
+
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+
+    /* ── CALENDAR ────────────────────────────── */
+    .cal-nav {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.9rem 2rem 0;
+    }
+
+    .cal-nav-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); cursor: pointer;
+      padding: 0.28rem 0.7rem; font-size: 0.85rem;
+      transition: background 0.12s;
+    }
+
+    .cal-nav-btn:hover { background: var(--surface3); }
+
+    .cal-month-label { font-size: 1.05rem; font-weight: 600; min-width: 145px; }
+
+    .cal-grid-wrap { padding: 0.9rem 2rem; flex: 1; overflow: auto; }
+
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+
+    .cal-dow {
+      text-align: center; font-size: 0.7rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.4px;
+      color: var(--muted); padding: 0.35rem 0;
+    }
+
+    .cal-day {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.45rem 0.5rem;
+      min-height: 85px; cursor: pointer;
+      transition: border-color 0.12s;
+    }
+
+    .cal-day:hover { border-color: var(--accent); }
+    .cal-day.other-month { opacity: 0.3; }
+    .cal-day.today { border-color: var(--accent); background: var(--surface2); }
+
+    .cal-day-num { font-size: 0.78rem; font-weight: 600; color: var(--muted); margin-bottom: 0.25rem; }
+    .cal-day.today .cal-day-num { color: var(--accent-light); }
+
+    .cal-event {
+      font-size: 0.66rem;
+      background: var(--accent-glow); border: 1px solid var(--accent);
+      border-radius: 3px; padding: 0.08rem 0.28rem; margin-bottom: 0.12rem;
+      color: var(--accent-light);
+      overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    }
+
+    /* ── ALARMS ──────────────────────────────── */
+    .alarms-body { padding: 1.4rem 2rem; flex: 1; overflow-y: auto; max-width: 540px; }
+
+    .add-alarm-form {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.1rem 1.2rem;
+      margin-bottom: 1.4rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem;
+    }
+
+    .add-alarm-form .form-group { display: flex; flex-direction: column; gap: 0.28rem; }
+
+    .add-alarm-form label {
+      font-size: 0.7rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted);
+    }
+
+    .add-alarm-form input,
+    .add-alarm-form select {
+      background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: 6px; padding: 0.48rem 0.65rem;
+      font-size: 0.86rem; color: var(--text); outline: none;
+    }
+
+    .add-alarm-form input:focus,
+    .add-alarm-form select:focus { border-color: var(--accent); }
+
+    .btn-full {
+      grid-column: 1 / -1;
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 8px; padding: 0.62rem;
+      font-size: 0.88rem; cursor: pointer; transition: opacity 0.14s;
+    }
+
+    .btn-full:hover { opacity: 0.8; }
+
+    .alarm-item {
+      display: flex; align-items: center; gap: 0.9rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 0.9rem 1.1rem;
+      margin-bottom: 0.6rem; transition: border-color 0.14s;
+    }
+
+    .alarm-item.off { opacity: 0.48; }
+
+    .alarm-time {
+      font-size: 1.5rem; font-weight: 300;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.4px; min-width: 75px;
+    }
+
+    .alarm-info { flex: 1; }
+    .alarm-label { font-size: 0.88rem; font-weight: 500; }
+    .alarm-repeat { font-size: 0.73rem; color: var(--muted); margin-top: 0.1rem; }
+
+    .alarm-del {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 0.82rem; opacity: 0; transition: opacity 0.12s;
+    }
+
+    .alarm-item:hover .alarm-del { opacity: 1; }
+    .alarm-del:hover { color: var(--danger); }
+
+    /* ── PROJECTS ────────────────────────────── */
+    .projects-body { padding: 1.4rem 2rem; flex: 1; overflow-y: auto; }
+
+    .add-project-form { display: flex; gap: 0.45rem; margin-bottom: 1.4rem; }
+
+    .add-project-form input {
+      flex: 1; background: var(--surface);
+      border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 0.6rem 0.9rem; font-size: 0.88rem;
+      color: var(--text); outline: none;
+    }
+
+    .add-project-form input:focus { border-color: var(--accent); }
+
+    .projects-table { width: 100%; border-collapse: collapse; }
+
+    .projects-table th {
+      text-align: left; padding: 0.55rem 0.8rem;
+      font-size: 0.7rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.45px;
+      color: var(--muted); border-bottom: 1px solid var(--border);
+    }
+
+    .project-row { border-bottom: 1px solid var(--border); cursor: default; transition: background 0.11s; }
+    .project-row:hover { background: var(--surface); }
+
+    .project-row td { padding: 0.7rem 0.8rem; font-size: 0.86rem; vertical-align: middle; }
+
+    .phase-badge {
+      display: inline-block; padding: 0.18rem 0.55rem;
+      border-radius: 20px; font-size: 0.7rem; font-weight: 500;
+    }
+
+    .phase-planning    { background: rgba(196,154,74,0.12); color: var(--warning);    border: 1px solid rgba(196,154,74,0.28); }
+    .phase-in-progress { background: rgba(93,158,93,0.12);  color: var(--accent-light); border: 1px solid rgba(93,158,93,0.28); }
+    .phase-review      { background: rgba(100,130,196,0.12); color: #7a9fd4;          border: 1px solid rgba(100,130,196,0.28); }
+    .phase-complete    { background: rgba(110,130,110,0.12); color: var(--muted);     border: 1px solid rgba(110,130,110,0.28); }
+
+    .expand-btn {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 0.75rem; transition: transform 0.15s;
+    }
+
+    .project-detail-row { display: none; }
+    .project-detail-row.open { display: table-row; }
+
+    .project-detail-cell {
+      padding: 0.7rem 0.8rem 1.2rem 2.4rem;
+      background: var(--surface);
+    }
+
+    .project-steps { display: flex; flex-direction: column; gap: 0.28rem; margin-bottom: 0.7rem; }
+
+    .project-step { display: flex; align-items: center; gap: 0.45rem; font-size: 0.82rem; }
+
+    .project-step-check {
+      width: 17px; height: 17px; border-radius: 3px;
+      border: 1.5px solid var(--border); cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.56rem; transition: all 0.12s;
+    }
+
+    .project-step.done .project-step-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .project-step.done .project-step-text  { text-decoration: line-through; color: var(--muted); }
+    .project-step-text { flex: 1; }
+
+    .btn-sm {
+      background: var(--surface3); border: 1.5px solid var(--border);
+      border-radius: 6px; color: var(--text);
+      padding: 0.32rem 0.65rem; font-size: 0.78rem;
+      cursor: pointer; transition: background 0.12s, border-color 0.12s;
+    }
+
+    .btn-sm:hover { background: var(--accent); border-color: var(--accent); }
+
+    /* ── SHARED ──────────────────────────────── */
+    .empty-state { text-align: center; color: var(--muted); padding: 2.2rem 1rem; font-size: 0.86rem; }
+
+    input[type="date"], input[type="time"] { color-scheme: dark; }
+    select option { background: #1e261e; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Todolendar</h1>
-    <p class="subtitle">Click a task to edit &bull; Double-click to complete</p>
 
-    <form class="add-form" id="add-form">
-      <input id="new-task" type="text" placeholder="What needs doing?" autocomplete="off" />
-      <button class="btn-add" type="submit" title="Add task">+</button>
-    </form>
-
-    <div class="filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="active">Active</button>
-      <button class="filter-btn" data-filter="done">Done</button>
+  <!-- ── SIDEBAR ── -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <h1>Planimal</h1>
+      <p>Your all-in-one planner</p>
     </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-section="my-day">
+        <span class="nav-icon">&#9788;</span><span>My Day</span>
+      </div>
+      <div class="nav-item" data-section="todo">
+        <span class="nav-icon">&#10003;</span><span>To-Do</span>
+      </div>
+      <div class="nav-item" data-section="calendar">
+        <span class="nav-icon">&#9724;</span><span>Calendar</span>
+      </div>
+      <div class="nav-item" data-section="alarms">
+        <span class="nav-icon">&#9900;</span><span>Alarms</span>
+      </div>
+      <div class="nav-item" data-section="projects">
+        <span class="nav-icon">&#9635;</span><span>Projects</span>
+      </div>
+    </nav>
+  </nav>
 
-    <div class="stats">
-      <span id="stats-text"></span>
-      <button class="clear-done" id="clear-done">Clear completed</button>
-    </div>
+  <!-- ── MAIN ── -->
+  <main class="main">
 
-    <ul id="todo-list"></ul>
-  </div>
+    <!-- MY DAY -->
+    <section class="section active" id="my-day">
+      <div class="section-header">
+        <div class="section-title" id="my-day-date"></div>
+        <div class="section-sub">Here's your day at a glance.</div>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-title">Due Today</div>
+          <div id="today-tasks-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Starred Tasks</div>
+          <div id="starred-tasks-list"></div>
+        </div>
+        <div class="card" style="grid-column:1/-1;">
+          <div class="card-title">Quick Add Task</div>
+          <form id="quick-add-form" style="display:flex;gap:.45rem;margin-top:.3rem;">
+            <input id="quick-add-input" type="text" placeholder="Add a task to My Tasks..."
+              style="flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:.55rem .85rem;font-size:.86rem;color:var(--text);outline:none;" />
+            <button class="btn-add" type="submit">+</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- TO-DO -->
+    <section class="section" id="todo">
+      <div class="todo-left">
+        <div class="list-tabs" id="list-tabs"></div>
+        <div class="add-task-form">
+          <form id="add-task-form">
+            <input id="new-task-input" type="text" placeholder="Add a task..." autocomplete="off" />
+            <button class="btn-add" type="submit">+</button>
+          </form>
+        </div>
+        <ul class="task-list" id="task-list" style="list-style:none;"></ul>
+      </div>
+      <div class="todo-right" id="todo-right">
+        <div class="todo-right-empty">Select a task to see details</div>
+      </div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section class="section" id="calendar">
+      <div class="section-header">
+        <div class="section-title">Calendar</div>
+        <div class="section-sub">Tasks with due dates appear here automatically.</div>
+      </div>
+      <div class="cal-nav">
+        <button class="cal-nav-btn" id="cal-prev">&#8592;</button>
+        <span class="cal-month-label" id="cal-month-label"></span>
+        <button class="cal-nav-btn" id="cal-next">&#8594;</button>
+        <button class="cal-nav-btn" id="cal-today-btn">Today</button>
+      </div>
+      <div class="cal-grid-wrap">
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+    </section>
+
+    <!-- ALARMS -->
+    <section class="section" id="alarms">
+      <div class="section-header">
+        <div class="section-title">Alarms</div>
+        <div class="section-sub">Schedule notifications with flexible repeat options.</div>
+      </div>
+      <div class="alarms-body">
+        <div class="add-alarm-form">
+          <div class="form-group">
+            <label>Time</label>
+            <input type="time" id="alarm-time" />
+          </div>
+          <div class="form-group">
+            <label>Date (optional)</label>
+            <input type="date" id="alarm-date" />
+          </div>
+          <div class="form-group">
+            <label>Label</label>
+            <input type="text" id="alarm-label" placeholder="Alarm label..." />
+          </div>
+          <div class="form-group">
+            <label>Repeat</label>
+            <select id="alarm-repeat">
+              <option value="none">No repeat</option>
+              <option value="daily">Every day</option>
+              <option value="weekdays">Weekdays</option>
+              <option value="weekly">Every week</option>
+              <option value="mon">Every Monday</option>
+              <option value="tue">Every Tuesday</option>
+              <option value="wed">Every Wednesday</option>
+              <option value="thu">Every Thursday</option>
+              <option value="fri">Every Friday</option>
+              <option value="sat">Every Saturday</option>
+              <option value="sun">Every Sunday</option>
+            </select>
+          </div>
+          <button class="btn-full" id="add-alarm-btn">Add Alarm</button>
+        </div>
+        <div id="alarms-list"></div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="section" id="projects">
+      <div class="section-header">
+        <div class="section-title">Projects Database</div>
+        <div class="section-sub">Track long-term work with phases, steps, and progress.</div>
+      </div>
+      <div class="projects-body">
+        <form class="add-project-form" id="add-project-form">
+          <input type="text" id="new-project-input" placeholder="Add a new project..." />
+          <button class="btn-add" type="submit">+</button>
+        </form>
+        <table class="projects-table">
+          <thead>
+            <tr>
+              <th style="width:28px;"></th>
+              <th>Project</th>
+              <th>Phase</th>
+              <th>Start</th>
+              <th>End</th>
+              <th style="width:100px;">Progress</th>
+              <th style="width:36px;"></th>
+            </tr>
+          </thead>
+          <tbody id="projects-tbody"></tbody>
+        </table>
+        <div id="projects-empty" class="empty-state" style="display:none;">
+          No projects yet — add one above
+        </div>
+      </div>
+    </section>
+
+  </main>
 
   <script>
-    // --- State ---
-    let todos = JSON.parse(localStorage.getItem('todos') || '[]');
-    let filter = 'all';
+  // ================================================================
+  //  STATE
+  // ================================================================
+  const state = {
+    activeSection: 'my-day',
+    todos:    [],
+    lists:    ['My Tasks'],
+    activeList: 'My Tasks',
+    selectedTodoId: null,
+    alarms:   [],
+    projects: [],
+    calDate:  new Date(),
+  };
 
-    function save() {
-      localStorage.setItem('todos', JSON.stringify(todos));
-    }
+  // ================================================================
+  //  PERSISTENCE
+  // ================================================================
+  function load() {
+    try {
+      state.todos    = JSON.parse(localStorage.getItem('pln_todos')    || '[]');
+      state.lists    = JSON.parse(localStorage.getItem('pln_lists')    || '["My Tasks"]');
+      state.alarms   = JSON.parse(localStorage.getItem('pln_alarms')   || '[]');
+      state.projects = JSON.parse(localStorage.getItem('pln_projects') || '[]');
+    } catch(e) { console.warn('Load error', e); }
+  }
 
-    // --- Render ---
-    function render() {
-      const list = document.getElementById('todo-list');
-      const visible = todos.filter(t =>
-        filter === 'all' ? true : filter === 'done' ? t.done : !t.done
-      );
+  function save() {
+    localStorage.setItem('pln_todos',    JSON.stringify(state.todos));
+    localStorage.setItem('pln_lists',    JSON.stringify(state.lists));
+    localStorage.setItem('pln_alarms',   JSON.stringify(state.alarms));
+    localStorage.setItem('pln_projects', JSON.stringify(state.projects));
+  }
 
-      list.innerHTML = '';
-
-      if (visible.length === 0) {
-        const empty = document.createElement('li');
-        empty.className = 'empty';
-        empty.innerHTML = filter === 'done'
-          ? '<span>🎉</span>Nothing completed yet'
-          : '<span>✨</span>Nothing here — add a task!';
-        list.appendChild(empty);
-      }
-
-      visible.forEach(todo => {
-        const li = document.createElement('li');
-        li.className = 'todo-item' + (todo.done ? ' done' : '');
-        li.dataset.id = todo.id;
-
-        // Checkbox
-        const check = document.createElement('div');
-        check.className = 'check';
-        check.title = todo.done ? 'Mark undone' : 'Mark done';
-        check.textContent = todo.done ? '✓' : '';
-        check.addEventListener('click', () => toggleDone(todo.id));
-
-        // Text / edit
-        const span = document.createElement('span');
-        span.className = 'todo-text';
-        span.textContent = todo.text;
-
-        // Single click → edit
-        span.addEventListener('click', () => startEdit(todo.id, li, span));
-
-        // Delete button
-        const del = document.createElement('button');
-        del.className = 'btn-del';
-        del.title = 'Delete';
-        del.textContent = '✕';
-        del.addEventListener('click', () => deleteTodo(todo.id));
-
-        li.appendChild(check);
-        li.appendChild(span);
-        li.appendChild(del);
-        list.appendChild(li);
-      });
-
-      // Stats
-      const total = todos.length;
-      const done = todos.filter(t => t.done).length;
-      document.getElementById('stats-text').textContent =
-        total === 0 ? '' : `${done} of ${total} completed`;
-      document.getElementById('clear-done').style.display =
-        done > 0 ? '' : 'none';
-    }
-
-    // --- Actions ---
-    function addTodo(text) {
-      text = text.trim();
-      if (!text) return;
-      todos.unshift({ id: Date.now(), text, done: false });
-      save();
-      render();
-    }
-
-    function toggleDone(id) {
-      const t = todos.find(t => t.id === id);
-      if (t) { t.done = !t.done; save(); render(); }
-    }
-
-    function deleteTodo(id) {
-      todos = todos.filter(t => t.id !== id);
-      save();
-      render();
-    }
-
-    function startEdit(id, li, span) {
-      if (li.querySelector('.edit-input')) return; // already editing
-      const t = todos.find(t => t.id === id);
-      if (!t) return;
-
-      const input = document.createElement('input');
-      input.className = 'edit-input';
-      input.value = t.text;
-      li.replaceChild(input, span);
-      input.focus();
-      input.select();
-
-      function commit() {
-        const val = input.value.trim();
-        if (val) t.text = val;
-        save();
-        render();
-      }
-
-      input.addEventListener('blur', commit);
-      input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') input.blur();
-        if (e.key === 'Escape') { input.value = t.text; input.blur(); }
-      });
-    }
-
-    // --- Event listeners ---
-    document.getElementById('add-form').addEventListener('submit', e => {
-      e.preventDefault();
-      const input = document.getElementById('new-task');
-      addTodo(input.value);
-      input.value = '';
+  // ================================================================
+  //  NAVIGATION
+  // ================================================================
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const sec = item.dataset.section;
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById(sec).classList.add('active');
+      state.activeSection = sec;
+      if (sec === 'my-day')   renderMyDay();
+      if (sec === 'calendar') renderCalendar();
+      if (sec === 'alarms')   renderAlarms();
+      if (sec === 'projects') renderProjects();
     });
+  });
 
-    document.querySelectorAll('.filter-btn').forEach(btn => {
+  // ================================================================
+  //  MY DAY
+  // ================================================================
+  function renderMyDay() {
+    const now = new Date();
+    document.getElementById('my-day-date').textContent =
+      now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+
+    const today = toDateStr(now);
+
+    // Due today
+    const dueTodayEl = document.getElementById('today-tasks-list');
+    const dueToday = state.todos.filter(t => t.dueDate === today);
+    dueTodayEl.innerHTML = '';
+    if (!dueToday.length) {
+      dueTodayEl.innerHTML = '<div class="empty-state" style="padding:1rem 0;">No tasks due today</div>';
+    } else {
+      dueToday.forEach(t => renderDayTask(dueTodayEl, t));
+    }
+
+    // Starred
+    const starredEl = document.getElementById('starred-tasks-list');
+    const starred = state.todos.filter(t => t.starred && !t.done);
+    starredEl.innerHTML = '';
+    if (!starred.length) {
+      starredEl.innerHTML = '<div class="empty-state" style="padding:1rem 0;">No starred tasks</div>';
+    } else {
+      starred.forEach(t => renderDayTask(starredEl, t));
+    }
+  }
+
+  function renderDayTask(container, t) {
+    const div = document.createElement('div');
+    div.className = 'day-task' + (t.done ? ' done' : '');
+    const chk = document.createElement('div');
+    chk.className = 'dt-check';
+    chk.innerHTML = t.done ? '&#10003;' : '';
+    chk.addEventListener('click', () => { toggleTodo(t.id); renderMyDay(); });
+    const txt = document.createElement('span');
+    txt.className = 'dt-text';
+    txt.textContent = t.text;
+    div.appendChild(chk);
+    div.appendChild(txt);
+    container.appendChild(div);
+  }
+
+  document.getElementById('quick-add-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const inp = document.getElementById('quick-add-input');
+    const text = inp.value.trim();
+    if (!text) return;
+    addTodo(text, 'My Tasks');
+    inp.value = '';
+    renderMyDay();
+  });
+
+  // ================================================================
+  //  TO-DO
+  // ================================================================
+  function addTodo(text, list) {
+    list = list || state.activeList;
+    state.todos.unshift({
+      id: Date.now(), text, done: false, starred: false,
+      list, dueDate: '', dueTime: '', alarm: false, category: '', steps: [],
+    });
+    save();
+    renderTodoList();
+  }
+
+  function toggleTodo(id) {
+    const t = state.todos.find(t => t.id === id);
+    if (t) { t.done = !t.done; save(); renderTodoList(); }
+  }
+
+  function deleteTodo(id) {
+    state.todos = state.todos.filter(t => t.id !== id);
+    if (state.selectedTodoId === id) {
+      state.selectedTodoId = null;
+      document.getElementById('todo-right').innerHTML =
+        '<div class="todo-right-empty">Select a task to see details</div>';
+    }
+    save();
+    renderTodoList();
+  }
+
+  function renderListTabs() {
+    const tabsEl = document.getElementById('list-tabs');
+    tabsEl.innerHTML = '';
+    state.lists.forEach(list => {
+      const btn = document.createElement('div');
+      btn.className = 'list-tab' + (list === state.activeList ? ' active' : '');
+      btn.textContent = list;
       btn.addEventListener('click', () => {
-        filter = btn.dataset.filter;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        render();
+        state.activeList = list;
+        state.selectedTodoId = null;
+        document.getElementById('todo-right').innerHTML =
+          '<div class="todo-right-empty">Select a task to see details</div>';
+        renderListTabs();
+        renderTodoList();
       });
+      tabsEl.appendChild(btn);
     });
 
-    document.getElementById('clear-done').addEventListener('click', () => {
-      todos = todos.filter(t => !t.done);
-      save();
-      render();
+    const newBtn = document.createElement('button');
+    newBtn.className = 'btn-new-list';
+    newBtn.textContent = '+ New List';
+    newBtn.addEventListener('click', () => {
+      const name = prompt('List name:');
+      if (name && name.trim() && !state.lists.includes(name.trim())) {
+        state.lists.push(name.trim());
+        state.activeList = name.trim();
+        save();
+        renderListTabs();
+        renderTodoList();
+      }
+    });
+    tabsEl.appendChild(newBtn);
+  }
+
+  function renderTodoList() {
+    const listEl = document.getElementById('task-list');
+    listEl.innerHTML = '';
+    const items = state.todos.filter(t => t.list === state.activeList);
+
+    if (!items.length) {
+      const li = document.createElement('li');
+      li.className = 'empty-state';
+      li.style.padding = '2rem 1rem';
+      li.textContent = 'No tasks — add one above';
+      listEl.appendChild(li);
+      return;
+    }
+
+    items.forEach(todo => {
+      const li = document.createElement('li');
+      li.className = 'task-item'
+        + (todo.done ? ' done' : '')
+        + (todo.id === state.selectedTodoId ? ' selected' : '');
+      li.dataset.id = todo.id;
+
+      const check = document.createElement('div');
+      check.className = 'task-check';
+      check.innerHTML = todo.done ? '&#10003;' : '';
+      check.addEventListener('click', e => { e.stopPropagation(); toggleTodo(todo.id); });
+
+      const title = document.createElement('span');
+      title.className = 'task-title-text';
+      title.textContent = todo.text;
+
+      const metaWrap = document.createElement('div');
+      metaWrap.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:.15rem;';
+      if (todo.dueDate) {
+        const badge = document.createElement('span');
+        badge.className = 'task-due-badge' + (isOverdue(todo) ? ' overdue' : '');
+        badge.textContent = formatShortDate(todo.dueDate);
+        metaWrap.appendChild(badge);
+      }
+
+      const star = document.createElement('button');
+      star.className = 'task-star' + (todo.starred ? ' starred' : '');
+      star.innerHTML = todo.starred ? '&#9733;' : '&#9734;';
+      star.title = todo.starred ? 'Unstar' : 'Star';
+      star.addEventListener('click', e => {
+        e.stopPropagation();
+        todo.starred = !todo.starred;
+        save(); renderTodoList();
+      });
+
+      li.appendChild(check);
+      li.appendChild(title);
+      li.appendChild(metaWrap);
+      li.appendChild(star);
+
+      li.addEventListener('click', () => {
+        state.selectedTodoId = todo.id;
+        renderTodoList();
+        renderDetailPanel(todo.id);
+      });
+
+      listEl.appendChild(li);
+    });
+  }
+
+  function renderDetailPanel(id) {
+    const todo = state.todos.find(t => t.id === id);
+    if (!todo) return;
+    const right = document.getElementById('todo-right');
+    right.innerHTML = '';
+
+    const panel = document.createElement('div');
+    panel.className = 'detail-panel';
+
+    // Title
+    const titleInput = document.createElement('input');
+    titleInput.className = 'detail-title-input';
+    titleInput.value = todo.text;
+    titleInput.placeholder = 'Task title';
+    titleInput.addEventListener('change', () => {
+      if (titleInput.value.trim()) { todo.text = titleInput.value.trim(); save(); renderTodoList(); }
     });
 
-    // --- Init ---
-    render();
+    // Steps section
+    const stepsSection = document.createElement('div');
+    stepsSection.className = 'detail-section';
+    stepsSection.innerHTML = '<div class="detail-label">Steps</div>';
+
+    const stepsList = document.createElement('div');
+    stepsList.className = 'steps-list';
+
+    function renderSteps() {
+      stepsList.innerHTML = '';
+      (todo.steps || []).forEach((step, i) => {
+        const div = document.createElement('div');
+        div.className = 'step-item' + (step.done ? ' done' : '');
+
+        const chk = document.createElement('div');
+        chk.className = 'step-check';
+        chk.innerHTML = step.done ? '&#10003;' : '';
+        chk.addEventListener('click', () => { step.done = !step.done; save(); renderSteps(); });
+
+        const txt = document.createElement('span');
+        txt.className = 'step-text';
+        txt.textContent = step.text;
+
+        const del = document.createElement('button');
+        del.className = 'step-del';
+        del.textContent = '✕';
+        del.addEventListener('click', () => { todo.steps.splice(i, 1); save(); renderSteps(); });
+
+        div.appendChild(chk); div.appendChild(txt); div.appendChild(del);
+        stepsList.appendChild(div);
+      });
+    }
+    renderSteps();
+
+    const addStepForm = document.createElement('div');
+    addStepForm.className = 'add-step-form';
+    addStepForm.innerHTML = '<input type="text" placeholder="Add a step..." /><button type="button">Add</button>';
+    const stepInput = addStepForm.querySelector('input');
+    const doAddStep = () => {
+      const val = stepInput.value.trim();
+      if (!val) return;
+      if (!todo.steps) todo.steps = [];
+      todo.steps.push({ text: val, done: false });
+      save(); stepInput.value = ''; renderSteps();
+    };
+    addStepForm.querySelector('button').addEventListener('click', doAddStep);
+    stepInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doAddStep(); } });
+
+    stepsSection.appendChild(stepsList);
+    stepsSection.appendChild(addStepForm);
+
+    // Details section
+    const detailsSection = document.createElement('div');
+    detailsSection.className = 'detail-section';
+    detailsSection.innerHTML = '<div class="detail-label">Details</div>';
+
+    function addDetailRow(labelText, inputEl) {
+      const row = document.createElement('div');
+      row.className = 'detail-row';
+      const lbl = document.createElement('label');
+      lbl.textContent = labelText;
+      row.appendChild(lbl);
+      row.appendChild(inputEl);
+      detailsSection.appendChild(row);
+    }
+
+    const dueDateInp = document.createElement('input');
+    dueDateInp.type = 'date'; dueDateInp.value = todo.dueDate || '';
+    dueDateInp.addEventListener('change', () => {
+      todo.dueDate = dueDateInp.value; save(); renderTodoList(); renderCalendar();
+    });
+    addDetailRow('Due Date', dueDateInp);
+
+    const dueTimeInp = document.createElement('input');
+    dueTimeInp.type = 'time'; dueTimeInp.value = todo.dueTime || '';
+    dueTimeInp.addEventListener('change', () => { todo.dueTime = dueTimeInp.value; save(); });
+    addDetailRow('Due Time', dueTimeInp);
+
+    const catInp = document.createElement('input');
+    catInp.type = 'text'; catInp.value = todo.category || '';
+    catInp.placeholder = 'e.g. Work, Personal...';
+    catInp.addEventListener('change', () => { todo.category = catInp.value.trim(); save(); });
+    addDetailRow('Category', catInp);
+
+    // Alarm toggle row
+    const alarmRow = document.createElement('div');
+    alarmRow.className = 'detail-row';
+    const alarmLbl = document.createElement('label');
+    alarmLbl.textContent = 'Alarm';
+    const toggle = makeToggle(!!todo.alarm, val => { todo.alarm = val; save(); });
+    alarmRow.appendChild(alarmLbl);
+    alarmRow.appendChild(toggle);
+    detailsSection.appendChild(alarmRow);
+
+    // Footer
+    const footer = document.createElement('div');
+    footer.className = 'detail-footer';
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn-danger';
+    delBtn.textContent = 'Delete Task';
+    delBtn.addEventListener('click', () => deleteTodo(todo.id));
+    footer.appendChild(delBtn);
+
+    panel.appendChild(titleInput);
+    panel.appendChild(stepsSection);
+    panel.appendChild(detailsSection);
+    panel.appendChild(footer);
+    right.appendChild(panel);
+  }
+
+  document.getElementById('add-task-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const inp = document.getElementById('new-task-input');
+    const text = inp.value.trim();
+    if (!text) return;
+    addTodo(text);
+    inp.value = '';
+  });
+
+  // ================================================================
+  //  CALENDAR
+  // ================================================================
+  const MONTHS = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  function renderCalendar() {
+    const d = state.calDate;
+    const year = d.getFullYear(), month = d.getMonth();
+    document.getElementById('cal-month-label').textContent = `${MONTHS[month]} ${year}`;
+
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+
+    DAYS.forEach(day => {
+      const el = document.createElement('div');
+      el.className = 'cal-dow';
+      el.textContent = day;
+      grid.appendChild(el);
+    });
+
+    const firstDay    = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today       = toDateStr(new Date());
+    const total       = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+
+    for (let i = 0; i < total; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cal-day';
+
+      let cellDate, dayNum;
+      if (i < firstDay) {
+        const dt = new Date(year, month - 1, new Date(year, month, 0).getDate() - firstDay + i + 1);
+        cellDate = toDateStr(dt);
+        dayNum = dt.getDate();
+        cell.classList.add('other-month');
+      } else if (i >= firstDay + daysInMonth) {
+        const dt = new Date(year, month + 1, i - firstDay - daysInMonth + 1);
+        cellDate = toDateStr(dt);
+        dayNum = dt.getDate();
+        cell.classList.add('other-month');
+      } else {
+        dayNum = i - firstDay + 1;
+        cellDate = `${year}-${String(month+1).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}`;
+        if (cellDate === today) cell.classList.add('today');
+
+        // Events from todos
+        const events = state.todos.filter(t => t.dueDate === cellDate);
+        const numEl = document.createElement('div');
+        numEl.className = 'cal-day-num';
+        numEl.textContent = dayNum;
+        cell.appendChild(numEl);
+        events.slice(0,3).forEach(ev => {
+          const evEl = document.createElement('div');
+          evEl.className = 'cal-event';
+          evEl.textContent = ev.text;
+          cell.appendChild(evEl);
+        });
+        if (events.length > 3) {
+          const more = document.createElement('div');
+          more.style.cssText = 'font-size:.63rem;color:var(--muted);padding-left:.28rem;';
+          more.textContent = `+${events.length - 3} more`;
+          cell.appendChild(more);
+        }
+        grid.appendChild(cell);
+        continue;
+      }
+
+      const numEl = document.createElement('div');
+      numEl.className = 'cal-day-num';
+      numEl.textContent = dayNum;
+      cell.appendChild(numEl);
+      grid.appendChild(cell);
+    }
+  }
+
+  document.getElementById('cal-prev').addEventListener('click', () => {
+    state.calDate = new Date(state.calDate.getFullYear(), state.calDate.getMonth() - 1, 1);
+    renderCalendar();
+  });
+  document.getElementById('cal-next').addEventListener('click', () => {
+    state.calDate = new Date(state.calDate.getFullYear(), state.calDate.getMonth() + 1, 1);
+    renderCalendar();
+  });
+  document.getElementById('cal-today-btn').addEventListener('click', () => {
+    state.calDate = new Date();
+    renderCalendar();
+  });
+
+  // ================================================================
+  //  ALARMS
+  // ================================================================
+  function renderAlarms() {
+    const listEl = document.getElementById('alarms-list');
+    listEl.innerHTML = '';
+    if (!state.alarms.length) {
+      listEl.innerHTML = '<div class="empty-state">No alarms set</div>';
+      return;
+    }
+    state.alarms.forEach((alarm, i) => {
+      const div = document.createElement('div');
+      div.className = 'alarm-item' + (!alarm.on ? ' off' : '');
+
+      const timeEl = document.createElement('div');
+      timeEl.className = 'alarm-time';
+      timeEl.textContent = formatTime12(alarm.time);
+
+      const info = document.createElement('div');
+      info.className = 'alarm-info';
+      const labelEl = document.createElement('div');
+      labelEl.className = 'alarm-label';
+      labelEl.textContent = alarm.label || 'Alarm';
+      const repeatEl = document.createElement('div');
+      repeatEl.className = 'alarm-repeat';
+      repeatEl.textContent = (alarm.date ? alarm.date + ' · ' : '') + formatRepeat(alarm.repeat);
+      info.appendChild(labelEl);
+      info.appendChild(repeatEl);
+
+      const toggle = makeToggle(!!alarm.on, val => {
+        alarm.on = val;
+        div.classList.toggle('off', !val);
+        save();
+      });
+
+      const del = document.createElement('button');
+      del.className = 'alarm-del';
+      del.textContent = '✕';
+      del.addEventListener('click', () => { state.alarms.splice(i, 1); save(); renderAlarms(); });
+
+      div.appendChild(timeEl);
+      div.appendChild(info);
+      div.appendChild(toggle);
+      div.appendChild(del);
+      listEl.appendChild(div);
+    });
+  }
+
+  document.getElementById('add-alarm-btn').addEventListener('click', () => {
+    const time   = document.getElementById('alarm-time').value;
+    const date   = document.getElementById('alarm-date').value;
+    const label  = document.getElementById('alarm-label').value.trim();
+    const repeat = document.getElementById('alarm-repeat').value;
+    if (!time) { alert('Please set a time for the alarm.'); return; }
+    state.alarms.push({ id: Date.now(), time, date, label, repeat, on: true });
+    save();
+    renderAlarms();
+    document.getElementById('alarm-time').value  = '';
+    document.getElementById('alarm-date').value  = '';
+    document.getElementById('alarm-label').value = '';
+    document.getElementById('alarm-repeat').value = 'none';
+  });
+
+  // ================================================================
+  //  PROJECTS
+  // ================================================================
+  function renderProjects() {
+    const tbody   = document.getElementById('projects-tbody');
+    const emptyEl = document.getElementById('projects-empty');
+    tbody.innerHTML = '';
+
+    if (!state.projects.length) {
+      emptyEl.style.display = '';
+      return;
+    }
+    emptyEl.style.display = 'none';
+
+    state.projects.forEach((proj, i) => {
+      // ── Main row ──
+      const tr = document.createElement('tr');
+      tr.className = 'project-row';
+
+      const expandBtn = document.createElement('button');
+      expandBtn.className = 'expand-btn';
+      expandBtn.innerHTML = '&#9654;';
+
+      const tdExpand = document.createElement('td');
+      tdExpand.appendChild(expandBtn);
+
+      const tdName = document.createElement('td');
+      tdName.style.fontWeight = '500';
+      tdName.textContent = proj.name;
+
+      const tdPhase = document.createElement('td');
+      const phaseBadge = document.createElement('span');
+      phaseBadge.className = `phase-badge phase-${proj.phase || 'planning'}`;
+      phaseBadge.textContent = phaseLabel(proj.phase);
+      tdPhase.appendChild(phaseBadge);
+
+      const tdStart = document.createElement('td');
+      const startInp = document.createElement('input');
+      startInp.type = 'date'; startInp.value = proj.start || '';
+      startInp.style.cssText = 'background:transparent;border:none;color:var(--text);font-size:.84rem;cursor:pointer;';
+      startInp.addEventListener('change', () => { proj.start = startInp.value; save(); });
+      tdStart.appendChild(startInp);
+
+      const tdEnd = document.createElement('td');
+      const endInp = document.createElement('input');
+      endInp.type = 'date'; endInp.value = proj.end || '';
+      endInp.style.cssText = 'background:transparent;border:none;color:var(--text);font-size:.84rem;cursor:pointer;';
+      endInp.addEventListener('change', () => { proj.end = endInp.value; save(); });
+      tdEnd.appendChild(endInp);
+
+      const tdProgress = document.createElement('td');
+      tdProgress.innerHTML = `
+        <div style="height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${proj.progress||0}%;background:var(--accent);border-radius:3px;transition:width .3s;"></div>
+        </div>
+        <div style="font-size:.68rem;color:var(--muted);text-align:center;margin-top:.15rem;">${proj.progress||0}%</div>`;
+
+      const tdDel = document.createElement('td');
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn-sm';
+      delBtn.style.cssText = 'border-color:var(--danger);color:var(--danger);';
+      delBtn.textContent = '✕';
+      delBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        state.projects.splice(i, 1);
+        save(); renderProjects();
+      });
+      tdDel.appendChild(delBtn);
+
+      tr.appendChild(tdExpand); tr.appendChild(tdName); tr.appendChild(tdPhase);
+      tr.appendChild(tdStart);  tr.appendChild(tdEnd);  tr.appendChild(tdProgress);
+      tr.appendChild(tdDel);
+
+      // ── Detail row ──
+      const detailTr = document.createElement('tr');
+      detailTr.className = 'project-detail-row';
+      const detailTd = document.createElement('td');
+      detailTd.className = 'project-detail-cell';
+      detailTd.colSpan = 7;
+
+      // Description
+      const descTA = document.createElement('textarea');
+      descTA.style.cssText = 'width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:.45rem .7rem;font-size:.84rem;color:var(--text);outline:none;resize:vertical;min-height:56px;margin-bottom:.75rem;font-family:inherit;';
+      descTA.placeholder = 'Project description...';
+      descTA.value = proj.desc || '';
+      descTA.addEventListener('change', () => { proj.desc = descTA.value; save(); });
+      detailTd.appendChild(descTA);
+
+      // Phase + progress row
+      const controlRow = document.createElement('div');
+      controlRow.style.cssText = 'display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;flex-wrap:wrap;';
+
+      const phaseLabel2 = document.createElement('label');
+      phaseLabel2.style.cssText = 'font-size:.76rem;color:var(--muted);';
+      phaseLabel2.textContent = 'Phase:';
+      const phaseSelect = document.createElement('select');
+      phaseSelect.style.cssText = 'background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:.28rem .55rem;font-size:.8rem;color:var(--text);outline:none;';
+      ['planning','in-progress','review','complete'].forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p; opt.textContent = phaseLabel(p);
+        if (proj.phase === p) opt.selected = true;
+        phaseSelect.appendChild(opt);
+      });
+      phaseSelect.addEventListener('change', () => { proj.phase = phaseSelect.value; save(); renderProjects(); });
+
+      const progLabel = document.createElement('label');
+      progLabel.style.cssText = 'font-size:.76rem;color:var(--muted);margin-left:.5rem;';
+      progLabel.textContent = 'Progress:';
+      const progInp = document.createElement('input');
+      progInp.type = 'range'; progInp.min = 0; progInp.max = 100;
+      progInp.value = proj.progress || 0;
+      progInp.style.cssText = 'width:120px;accent-color:var(--accent);';
+      const progVal = document.createElement('span');
+      progVal.style.cssText = 'font-size:.78rem;color:var(--muted);min-width:32px;';
+      progVal.textContent = (proj.progress||0) + '%';
+      progInp.addEventListener('input', () => {
+        proj.progress = parseInt(progInp.value);
+        progVal.textContent = proj.progress + '%';
+        save();
+      });
+
+      controlRow.appendChild(phaseLabel2); controlRow.appendChild(phaseSelect);
+      controlRow.appendChild(progLabel);   controlRow.appendChild(progInp);
+      controlRow.appendChild(progVal);
+      detailTd.appendChild(controlRow);
+
+      // Steps label
+      const stepsLbl = document.createElement('div');
+      stepsLbl.style.cssText = 'font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);margin-bottom:.35rem;';
+      stepsLbl.textContent = 'Steps';
+      detailTd.appendChild(stepsLbl);
+
+      const stepsDiv = document.createElement('div');
+      stepsDiv.className = 'project-steps';
+
+      function renderProjSteps() {
+        stepsDiv.innerHTML = '';
+        (proj.steps || []).forEach((s, si) => {
+          const div = document.createElement('div');
+          div.className = 'project-step' + (s.done ? ' done' : '');
+
+          const chk = document.createElement('div');
+          chk.className = 'project-step-check';
+          chk.innerHTML = s.done ? '&#10003;' : '';
+          chk.addEventListener('click', () => { s.done = !s.done; save(); renderProjSteps(); });
+
+          const txt = document.createElement('span');
+          txt.className = 'project-step-text';
+          txt.textContent = s.text;
+
+          const del = document.createElement('button');
+          del.style.cssText = 'background:none;border:none;color:var(--muted);cursor:pointer;font-size:.72rem;padding:0;opacity:0;transition:opacity .12s;';
+          del.textContent = '✕';
+          div.addEventListener('mouseenter', () => del.style.opacity = '1');
+          div.addEventListener('mouseleave', () => del.style.opacity = '0');
+          del.addEventListener('click', () => { proj.steps.splice(si,1); save(); renderProjSteps(); });
+
+          div.appendChild(chk); div.appendChild(txt); div.appendChild(del);
+          stepsDiv.appendChild(div);
+        });
+      }
+      renderProjSteps();
+      detailTd.appendChild(stepsDiv);
+
+      // Add step
+      const addStepRow = document.createElement('div');
+      addStepRow.style.cssText = 'display:flex;gap:.4rem;margin-top:.3rem;';
+      const stepInp = document.createElement('input');
+      stepInp.type = 'text'; stepInp.placeholder = 'Add a step...';
+      stepInp.style.cssText = 'flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:.32rem .6rem;font-size:.8rem;color:var(--text);outline:none;';
+      const addStepBtn = document.createElement('button');
+      addStepBtn.className = 'btn-sm';
+      addStepBtn.textContent = 'Add Step';
+      const doAddStep = () => {
+        const v = stepInp.value.trim();
+        if (!v) return;
+        if (!proj.steps) proj.steps = [];
+        proj.steps.push({ text: v, done: false });
+        save(); stepInp.value = ''; renderProjSteps();
+      };
+      addStepBtn.addEventListener('click', doAddStep);
+      stepInp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doAddStep(); } });
+      addStepRow.appendChild(stepInp); addStepRow.appendChild(addStepBtn);
+      detailTd.appendChild(addStepRow);
+
+      detailTr.appendChild(detailTd);
+
+      expandBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        const open = detailTr.classList.toggle('open');
+        expandBtn.style.transform = open ? 'rotate(90deg)' : '';
+      });
+
+      tbody.appendChild(tr);
+      tbody.appendChild(detailTr);
+    });
+  }
+
+  document.getElementById('add-project-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const inp = document.getElementById('new-project-input');
+    const name = inp.value.trim();
+    if (!name) return;
+    state.projects.push({ id: Date.now(), name, phase: 'planning', start:'', end:'', progress: 0, desc:'', steps:[] });
+    save(); inp.value = ''; renderProjects();
+  });
+
+  // ================================================================
+  //  HELPERS
+  // ================================================================
+  function makeToggle(checked, onChange) {
+    const label = document.createElement('label');
+    label.className = 'toggle';
+    const inp = document.createElement('input');
+    inp.type = 'checkbox'; inp.checked = checked;
+    inp.addEventListener('change', () => onChange(inp.checked));
+    const slider = document.createElement('span');
+    slider.className = 'toggle-slider';
+    label.appendChild(inp); label.appendChild(slider);
+    return label;
+  }
+
+  function toDateStr(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function formatShortDate(d) {
+    if (!d) return '';
+    const [, m, day] = d.split('-');
+    return `${parseInt(m)}/${parseInt(day)}`;
+  }
+
+  function isOverdue(todo) {
+    if (!todo.dueDate || todo.done) return false;
+    return todo.dueDate < toDateStr(new Date());
+  }
+
+  function formatTime12(t) {
+    if (!t) return '';
+    const [h, m] = t.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${ampm}`;
+  }
+
+  function formatRepeat(r) {
+    const map = {
+      none:'No repeat', daily:'Every day', weekdays:'Weekdays', weekly:'Every week',
+      mon:'Mondays', tue:'Tuesdays', wed:'Wednesdays', thu:'Thursdays',
+      fri:'Fridays', sat:'Saturdays', sun:'Sundays',
+    };
+    return map[r] || r;
+  }
+
+  function phaseLabel(p) {
+    const map = { planning:'Planning', 'in-progress':'In Progress', review:'Review', complete:'Complete' };
+    return map[p] || 'Planning';
+  }
+
+  // ================================================================
+  //  INIT
+  // ================================================================
+  load();
+  renderMyDay();
+  renderListTabs();
+  renderTodoList();
   </script>
 </body>
 </html>

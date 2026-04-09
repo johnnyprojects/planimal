@@ -4,8 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Planimal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    html { font-size: 115%; }
+    html { font-size: 115%; zoom: 1.05; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -41,6 +42,7 @@
       background: transparent;
       display: flex;
       flex-direction: column;
+      align-items: center;
       height: 100vh;
       position: fixed;
       top: 0; left: 0;
@@ -52,6 +54,7 @@
       border-right: 1px solid var(--border);
       border-radius: 0 0 12px 0;
       width: 340px;
+      align-self: flex-start;
       background: rgba(10, 15, 10, 0.82);
     }
 
@@ -66,12 +69,14 @@
 
     .sidebar-nav {
       flex: 1;
+      width: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       gap: 10px;
-      padding: 2rem 0;
+      padding-top: 2rem;
+      padding-bottom: 130px;
       border-right: 1px solid var(--border);
       background: rgba(10, 15, 10, 0.82);
     }
@@ -625,19 +630,19 @@
     </div>
     <nav class="sidebar-nav">
       <div class="nav-item active" data-section="my-day">
-        <span class="nav-icon">&#9788;</span><span>My Day</span>
+        <span class="nav-icon"><i class="fa-solid fa-sun"></i></span><span>My Day</span>
       </div>
       <div class="nav-item" data-section="todo">
-        <span class="nav-icon">&#10003;</span><span>To-Do</span>
+        <span class="nav-icon"><i class="fa-solid fa-list-check"></i></span><span>To-Do</span>
       </div>
       <div class="nav-item" data-section="calendar">
-        <span class="nav-icon">&#9724;</span><span>Calendar</span>
+        <span class="nav-icon"><i class="fa-solid fa-calendar-days"></i></span><span>Calendar</span>
       </div>
       <div class="nav-item" data-section="alarms">
-        <span class="nav-icon">&#9900;</span><span>Alarms</span>
+        <span class="nav-icon"><i class="fa-solid fa-bell"></i></span><span>Alarms</span>
       </div>
       <div class="nav-item" data-section="projects">
-        <span class="nav-icon">&#9635;</span><span>Projects</span>
+        <span class="nav-icon"><i class="fa-solid fa-diagram-project"></i></span><span>Projects</span>
       </div>
     </nav>
   </nav>

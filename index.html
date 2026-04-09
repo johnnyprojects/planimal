@@ -125,10 +125,15 @@
     .nav-icon { text-align: center; font-size: 1.5rem; flex-shrink: 0; }
 
     /* ── MAIN ────────────────────────────────── */
-    .main { margin-left: 340px; flex: 1; min-height: 100vh; overflow: auto; }
+    .main { margin-left: 340px; flex: 1; min-height: 100vh; overflow: auto; position: relative; }
 
-    .section { display: none; height: 100vh; }
-    .section.active { display: flex; flex-direction: column; }
+    .section {
+      display: flex; flex-direction: column;
+      position: absolute; inset: 0; height: 100vh;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+    .section.active { opacity: 1; pointer-events: auto; }
 
     .section-header {
       padding: 1.4rem 2rem 0.9rem;
@@ -193,14 +198,12 @@
     /* ── TO-DO ───────────────────────────────── */
     #todo { flex-direction: row !important; }
 
-    .todo-left {
-      width: 310px; flex-shrink: 0;
-      border-right: 1px solid var(--border);
-      display: flex; flex-direction: column;
+    /* Task area — the core todo section */
+    .todo-section {
+      flex: 1; display: flex; flex-direction: column;
       height: 100vh;
+      padding: 3.5rem 35% 2rem 8rem;
     }
-
-    .todo-right { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
 
     .list-tabs {
       display: flex; gap: 0;
@@ -243,8 +246,8 @@
       background: var(--surface2);
       border: 1.5px solid var(--border);
       border-radius: 8px;
-      padding: 0.55rem 0.8rem;
-      font-size: 0.86rem;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
       color: var(--text); outline: none;
       transition: border-color 0.18s;
     }
@@ -260,17 +263,67 @@
 
     .btn-add:hover { opacity: 0.8; }
 
-    .task-list { flex: 1; overflow-y: auto; padding: 0.35rem 0; }
+    .task-list { overflow-y: auto; padding: 0.35rem 0; }
+
+    .task-section-header {
+      font-size: 0.82rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--muted);
+      padding: 0.6rem 0.2rem 0.25rem;
+    }
+
+    .starred-list { margin-bottom: 0.5rem; }
+
+    .starred-list .task-item { background: rgba(196, 154, 74, 0.52); border: 1px solid rgba(212, 170, 84, 0.4); }
+    .starred-list .task-item .task-title-text { color: #fff; font-weight: 600; }
+    .starred-list .task-item .task-check { border-color: rgba(255,255,255,0.6); }
+    .starred-list .task-item .task-star { color: #fff; }
+    .starred-list .task-item .task-due-badge { color: rgba(255,255,255,0.7); }
+    .starred-list .task-item:hover { background: rgba(196, 154, 74, 0.65); border-left-color: #ffc24a; }
+
+    .completed-toggle {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 0.2rem;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      user-select: none;
+      width: fit-content;
+      transition: color 0.15s;
+    }
+
+    .completed-toggle:hover { color: var(--text); }
+
+    .completed-caret {
+      font-size: 0.7rem;
+      transition: transform 0.25s ease;
+    }
+
+    .completed-caret.open { transform: rotate(90deg); }
+
+    .completed-list {
+      max-height: 0;
+      overflow: hidden;
+      pointer-events: none;
+      transition: max-height 0.35s ease;
+    }
+
+    .completed-list.open { max-height: 2000px; pointer-events: auto; }
 
     .task-item {
       display: flex; align-items: center; gap: 0.6rem;
-      padding: 0.6rem 0.9rem;
+      padding: 0.85rem 1rem;
       cursor: pointer; transition: background 0.11s;
       border-left: 3px solid transparent;
+      background: var(--surface);
+      border-radius: 8px;
+      margin-bottom: 0.4rem;
     }
 
-    .task-item:hover { background: var(--surface); }
-    .task-item.selected { background: var(--surface2); border-left-color: var(--accent); }
+    .task-item:hover { background: var(--surface2); border-left-color: var(--accent); }
     .task-item.done .task-title-text { text-decoration: line-through; color: var(--muted); }
 
     .task-check {
@@ -286,14 +339,14 @@
     .task-item.done .task-check { background: var(--accent); border-color: var(--accent); color: #fff; }
     .task-check:hover { border-color: var(--accent); }
 
-    .task-title-text { flex: 1; font-size: 0.88rem; line-height: 1.35; }
+    .task-title-text { flex: 1; font-size: 1.05rem; line-height: 1.4; }
 
     .task-due-badge { font-size: 0.67rem; color: var(--muted); }
     .task-due-badge.overdue { color: var(--danger); }
 
     .task-star {
       background: none; border: none; cursor: pointer;
-      color: var(--muted); font-size: 0.88rem; padding: 0;
+      color: var(--muted); font-size: 1.3rem; padding: 0 0.5rem 0 0;
       transition: color 0.13s; flex-shrink: 0;
     }
 
@@ -685,18 +738,23 @@
 
     <!-- TO-DO -->
     <section class="section" id="todo">
-      <div class="todo-left">
-        <div class="list-tabs" id="list-tabs"></div>
+      <!-- Task area (the todo section) -->
+      <div class="todo-section">
         <div class="add-task-form">
           <form id="add-task-form">
             <input id="new-task-input" type="text" placeholder="Add a task..." autocomplete="off" />
             <button class="btn-add" type="submit">+</button>
           </form>
         </div>
+        <div class="task-section-header" id="favorites-header" style="display:none; color: var(--warning);">Starred</div>
+        <ul class="task-list starred-list" id="starred-list" style="list-style:none;"></ul>
+        <div class="task-section-header" id="tasks-header">Tasks</div>
         <ul class="task-list" id="task-list" style="list-style:none;"></ul>
-      </div>
-      <div class="todo-right" id="todo-right">
-        <div class="todo-right-empty">Select a task to see details</div>
+        <div class="completed-toggle" id="completed-toggle">
+          <i class="fa-solid fa-chevron-right completed-caret" id="completed-caret"></i>
+          <span>Completed Tasks</span>
+        </div>
+        <ul class="task-list completed-list" id="completed-list" style="list-style:none;"></ul>
       </div>
     </section>
 
@@ -963,69 +1021,96 @@
     tabsEl.appendChild(newBtn);
   }
 
-  function renderTodoList() {
-    const listEl = document.getElementById('task-list');
-    listEl.innerHTML = '';
-    const items = state.todos.filter(t => t.list === state.activeList);
+  function buildTaskItem(todo) {
+    const li = document.createElement('li');
+    li.className = 'task-item' + (todo.done ? ' done' : '') + (todo.id === state.selectedTodoId ? ' selected' : '');
+    li.dataset.id = todo.id;
 
-    if (!items.length) {
-      const li = document.createElement('li');
-      li.className = 'empty-state';
-      li.style.padding = '2rem 1rem';
-      li.textContent = 'No tasks — add one above';
-      listEl.appendChild(li);
-      return;
+    const check = document.createElement('div');
+    check.className = 'task-check';
+    check.innerHTML = todo.done ? '&#10003;' : '';
+    check.addEventListener('click', e => { e.stopPropagation(); toggleTodo(todo.id); });
+
+    const title = document.createElement('span');
+    title.className = 'task-title-text';
+    title.textContent = todo.text;
+
+    const metaWrap = document.createElement('div');
+    metaWrap.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:.15rem;';
+    if (todo.dueDate) {
+      const badge = document.createElement('span');
+      badge.className = 'task-due-badge' + (isOverdue(todo) ? ' overdue' : '');
+      badge.textContent = formatShortDate(todo.dueDate);
+      metaWrap.appendChild(badge);
     }
 
-    items.forEach(todo => {
-      const li = document.createElement('li');
-      li.className = 'task-item'
-        + (todo.done ? ' done' : '')
-        + (todo.id === state.selectedTodoId ? ' selected' : '');
-      li.dataset.id = todo.id;
-
-      const check = document.createElement('div');
-      check.className = 'task-check';
-      check.innerHTML = todo.done ? '&#10003;' : '';
-      check.addEventListener('click', e => { e.stopPropagation(); toggleTodo(todo.id); });
-
-      const title = document.createElement('span');
-      title.className = 'task-title-text';
-      title.textContent = todo.text;
-
-      const metaWrap = document.createElement('div');
-      metaWrap.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:.15rem;';
-      if (todo.dueDate) {
-        const badge = document.createElement('span');
-        badge.className = 'task-due-badge' + (isOverdue(todo) ? ' overdue' : '');
-        badge.textContent = formatShortDate(todo.dueDate);
-        metaWrap.appendChild(badge);
-      }
-
-      const star = document.createElement('button');
-      star.className = 'task-star' + (todo.starred ? ' starred' : '');
-      star.innerHTML = todo.starred ? '&#9733;' : '&#9734;';
-      star.title = todo.starred ? 'Unstar' : 'Star';
-      star.addEventListener('click', e => {
-        e.stopPropagation();
-        todo.starred = !todo.starred;
-        save(); renderTodoList();
-      });
-
-      li.appendChild(check);
-      li.appendChild(title);
-      li.appendChild(metaWrap);
-      li.appendChild(star);
-
-      li.addEventListener('click', () => {
-        state.selectedTodoId = todo.id;
-        renderTodoList();
-        renderDetailPanel(todo.id);
-      });
-
-      listEl.appendChild(li);
+    const star = document.createElement('button');
+    star.className = 'task-star' + (todo.starred ? ' starred' : '');
+    star.innerHTML = todo.starred ? '&#9733;' : '&#9734;';
+    star.title = todo.starred ? 'Unstar' : 'Star';
+    star.addEventListener('click', e => {
+      e.stopPropagation();
+      todo.starred = !todo.starred;
+      save(); renderTodoList();
     });
+
+    li.appendChild(check);
+    li.appendChild(title);
+    li.appendChild(metaWrap);
+    li.appendChild(star);
+    li.addEventListener('click', () => { state.selectedTodoId = todo.id; renderTodoList(); });
+    return li;
   }
+
+  function renderTodoList() {
+    const listEl = document.getElementById('task-list');
+    const completedEl = document.getElementById('completed-list');
+    const starredEl = document.getElementById('starred-list');
+    listEl.innerHTML = '';
+    completedEl.innerHTML = '';
+    starredEl.innerHTML = '';
+
+    const all = state.todos.filter(t => t.list === state.activeList);
+    const starred = all.filter(t => !t.done && t.starred);
+    const regular = all.filter(t => !t.done && !t.starred);
+    const done = all.filter(t => t.done);
+
+    // Starred section
+    const favHeader = document.getElementById('favorites-header');
+    favHeader.style.display = starred.length ? 'block' : 'none';
+    favHeader.textContent = `Starred${starred.length ? ' (' + starred.length + ')' : ''}`;
+    favHeader.style.color = 'var(--warning)';
+    starred.forEach(todo => starredEl.appendChild(buildTaskItem(todo)));
+
+    // Tasks header count
+    document.getElementById('tasks-header').textContent = `Tasks${regular.length ? ' (' + regular.length + ')' : ''}`;
+
+    // Regular active tasks
+    if (!regular.length && !starred.length) {
+      const li = document.createElement('li');
+      li.className = 'empty-state';
+      li.style.padding = '2rem 0';
+      li.textContent = 'No tasks — add one above';
+      listEl.appendChild(li);
+    } else {
+      regular.forEach(todo => listEl.appendChild(buildTaskItem(todo)));
+    }
+
+    // Completed section
+    const completedToggle = document.getElementById('completed-toggle');
+    const countSpan = completedToggle.querySelector('span');
+    countSpan.textContent = `Completed${done.length ? ' (' + done.length + ')' : ''}`;
+    completedToggle.style.display = done.length ? 'flex' : 'none';
+    done.forEach(todo => completedEl.appendChild(buildTaskItem(todo)));
+  }
+
+  // Completed list toggle
+  document.getElementById('completed-toggle').addEventListener('click', () => {
+    const list = document.getElementById('completed-list');
+    const caret = document.getElementById('completed-caret');
+    list.classList.toggle('open');
+    caret.classList.toggle('open');
+  });
 
   function renderDetailPanel(id) {
     const todo = state.todos.find(t => t.id === id);
@@ -1580,7 +1665,6 @@
   // ================================================================
   load();
   renderMyDay();
-  renderListTabs();
   renderTodoList();
   </script>
 </body>

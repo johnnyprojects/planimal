@@ -856,7 +856,7 @@
 
     .project-steps { display: flex; flex-direction: column; gap: 0.28rem; margin-bottom: 0.7rem; }
 
-    .project-step { display: flex; align-items: center; gap: 0.45rem; font-size: 0.82rem; }
+    .project-step { display: flex; align-items: center; gap: 0.45rem; font-size: 0.82rem; background: var(--surface2); border-radius: 5px; padding: 0.3rem 0.4rem; margin-bottom: 0.15rem; }
 
     .project-step-check {
       width: 17px; height: 17px; border-radius: 3px;
@@ -867,6 +867,7 @@
 
     .project-step.done .project-step-check { background: var(--accent); border-color: var(--accent); color: #fff; }
     .project-step.done .project-step-text  { text-decoration: line-through; color: var(--muted); }
+    .project-step.done { opacity: 0.55; }
     .project-step-text { flex: 1; }
 
     .btn-sm {
@@ -1967,11 +1968,16 @@
       tdEnd.appendChild(endInp);
 
       const tdProgress = document.createElement('td');
-      tdProgress.innerHTML = `
-        <div style="height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;">
-          <div style="height:100%;width:${proj.progress||0}%;background:var(--accent);border-radius:3px;transition:width .3s;"></div>
-        </div>
-        <div style="font-size:.68rem;color:var(--muted);text-align:center;margin-top:.15rem;">${proj.progress||0}%</div>`;
+      const progBar = document.createElement('div');
+      progBar.style.cssText = 'height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;';
+      const progFill = document.createElement('div');
+      progFill.style.cssText = `height:100%;width:${proj.progress||0}%;background:var(--accent);border-radius:3px;transition:width .3s;`;
+      const progPct = document.createElement('div');
+      progPct.style.cssText = 'font-size:.68rem;color:var(--muted);text-align:center;margin-top:.15rem;';
+      progPct.textContent = (proj.progress||0) + '%';
+      progBar.appendChild(progFill);
+      tdProgress.appendChild(progBar);
+      tdProgress.appendChild(progPct);
 
       const tdDel = document.createElement('td');
       const delBtn = document.createElement('button');
@@ -1996,23 +2002,28 @@
       detailTd.className = 'project-detail-cell';
       detailTd.colSpan = 7;
 
-      // Description
+      // Two-column layout
+      const layout = document.createElement('div');
+      layout.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;';
+
+      // ── LEFT: description + controls ──
+      const leftCol = document.createElement('div');
+      leftCol.style.cssText = 'display:flex;flex-direction:column;gap:0.75rem;';
+
+      const descLbl = document.createElement('div');
+      descLbl.style.cssText = 'font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);';
+      descLbl.textContent = 'Description';
       const descTA = document.createElement('textarea');
-      descTA.style.cssText = 'width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:.45rem .7rem;font-size:.84rem;color:var(--text);outline:none;resize:vertical;min-height:56px;margin-bottom:.75rem;font-family:inherit;';
+      descTA.style.cssText = 'width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:.45rem .7rem;font-size:.84rem;color:var(--text);outline:none;resize:vertical;min-height:72px;font-family:inherit;box-sizing:border-box;';
       descTA.placeholder = 'Project description...';
       descTA.value = proj.desc || '';
       descTA.addEventListener('change', () => { proj.desc = descTA.value; save(); });
-      detailTd.appendChild(descTA);
 
-      // Phase + progress row
-      const controlRow = document.createElement('div');
-      controlRow.style.cssText = 'display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;flex-wrap:wrap;';
-
-      const phaseLabel2 = document.createElement('label');
-      phaseLabel2.style.cssText = 'font-size:.76rem;color:var(--muted);';
-      phaseLabel2.textContent = 'Phase:';
+      const phaseLbl2 = document.createElement('div');
+      phaseLbl2.style.cssText = 'font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);';
+      phaseLbl2.textContent = 'Phase';
       const phaseSelect = document.createElement('select');
-      phaseSelect.style.cssText = 'background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:.28rem .55rem;font-size:.8rem;color:var(--text);outline:none;';
+      phaseSelect.style.cssText = 'background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:.32rem .6rem;font-size:.84rem;color:var(--text);outline:none;width:100%;';
       ['planning','in-progress','review','complete'].forEach(p => {
         const opt = document.createElement('option');
         opt.value = p; opt.textContent = phaseLabel(p);
@@ -2021,39 +2032,76 @@
       });
       phaseSelect.addEventListener('change', () => { proj.phase = phaseSelect.value; save(); renderProjects(); });
 
-      const progLabel = document.createElement('label');
-      progLabel.style.cssText = 'font-size:.76rem;color:var(--muted);margin-left:.5rem;';
-      progLabel.textContent = 'Progress:';
+      const progLbl2 = document.createElement('div');
+      progLbl2.style.cssText = 'font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);';
+      progLbl2.textContent = 'Progress';
+      const progRow = document.createElement('div');
+      progRow.style.cssText = 'display:flex;align-items:center;gap:.6rem;';
       const progInp = document.createElement('input');
       progInp.type = 'range'; progInp.min = 0; progInp.max = 100;
       progInp.value = proj.progress || 0;
-      progInp.style.cssText = 'width:120px;accent-color:var(--accent);';
+      progInp.style.cssText = 'width:50%;accent-color:var(--accent);';
       const progVal = document.createElement('span');
-      progVal.style.cssText = 'font-size:.78rem;color:var(--muted);min-width:32px;';
+      progVal.style.cssText = 'font-size:.82rem;color:var(--muted);min-width:36px;text-align:right;';
       progVal.textContent = (proj.progress||0) + '%';
       progInp.addEventListener('input', () => {
         proj.progress = parseInt(progInp.value);
         progVal.textContent = proj.progress + '%';
+        progFill.style.width = proj.progress + '%';
+        progPct.textContent = proj.progress + '%';
         save();
       });
+      progRow.appendChild(progInp); progRow.appendChild(progVal);
 
-      controlRow.appendChild(phaseLabel2); controlRow.appendChild(phaseSelect);
-      controlRow.appendChild(progLabel);   controlRow.appendChild(progInp);
-      controlRow.appendChild(progVal);
-      detailTd.appendChild(controlRow);
+      leftCol.appendChild(descLbl); leftCol.appendChild(descTA);
+      leftCol.appendChild(phaseLbl2); leftCol.appendChild(phaseSelect);
+      leftCol.appendChild(progLbl2); leftCol.appendChild(progRow);
 
-      // Steps label
+      // ── RIGHT: steps ──
+      const rightCol = document.createElement('div');
+      rightCol.style.cssText = 'display:flex;flex-direction:column;gap:0.5rem;';
+
       const stepsLbl = document.createElement('div');
-      stepsLbl.style.cssText = 'font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);margin-bottom:.35rem;';
+      stepsLbl.style.cssText = 'font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);';
       stepsLbl.textContent = 'Steps';
-      detailTd.appendChild(stepsLbl);
 
       const stepsDiv = document.createElement('div');
       stepsDiv.className = 'project-steps';
+      stepsDiv.style.cssText = 'max-height:220px;overflow-y:auto;border:1.5px solid var(--border);border-radius:7px;padding:0.4rem 0.5rem;';
 
       function renderProjSteps() {
         stepsDiv.innerHTML = '';
-        (proj.steps || []).forEach((s, si) => {
+        const sorted = [...(proj.steps || [])].sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
+        sorted.forEach((s, si) => {
+          const realIdx = proj.steps.indexOf(s);
+          const wrapper = document.createElement('div');
+          wrapper.style.cssText = 'margin-bottom:0.1rem;';
+          wrapper.draggable = true;
+          wrapper.dataset.idx = realIdx;
+
+          wrapper.addEventListener('dragstart', e => {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', si);
+            wrapper.style.opacity = '0.4';
+          });
+          wrapper.addEventListener('dragend', () => { wrapper.style.opacity = ''; stepsDiv.querySelectorAll('[data-idx]').forEach(el => el.style.borderTop = ''); });
+          wrapper.addEventListener('dragover', e => {
+            e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+            stepsDiv.querySelectorAll('[data-idx]').forEach(el => el.style.borderTop = '');
+            wrapper.style.borderTop = '2px solid var(--accent)';
+          });
+          wrapper.addEventListener('dragleave', () => { wrapper.style.borderTop = ''; });
+          wrapper.addEventListener('drop', e => {
+            e.preventDefault();
+            const from = parseInt(e.dataTransfer.getData('text/plain'));
+            const to = parseInt(wrapper.dataset.idx);
+            if (from === to) return;
+            const moved = proj.steps.splice(from, 1)[0];
+            proj.steps.splice(to, 0, moved);
+            save(); renderProjSteps();
+          });
+
+          // Main step row
           const div = document.createElement('div');
           div.className = 'project-step' + (s.done ? ' done' : '');
 
@@ -2066,26 +2114,100 @@
           txt.className = 'project-step-text';
           txt.textContent = s.text;
 
-          const del = document.createElement('button');
-          del.style.cssText = 'background:none;border:none;color:var(--muted);cursor:pointer;font-size:.72rem;padding:0;opacity:0;transition:opacity .12s;';
-          del.textContent = '✕';
-          div.addEventListener('mouseenter', () => del.style.opacity = '1');
-          div.addEventListener('mouseleave', () => del.style.opacity = '0');
-          del.addEventListener('click', () => { proj.steps.splice(si,1); save(); renderProjSteps(); });
+          const addSubBtn = document.createElement('button');
+          addSubBtn.style.cssText = 'background:none;border:none;color:var(--muted);cursor:pointer;font-size:.68rem;padding:0 0.3rem;opacity:0;transition:opacity .12s;';
+          addSubBtn.title = 'Add sub-step';
+          addSubBtn.textContent = '+ sub';
 
-          div.appendChild(chk); div.appendChild(txt); div.appendChild(del);
-          stepsDiv.appendChild(div);
+          const del = document.createElement('button');
+          del.style.cssText = 'background:none;border:none;color:var(--muted);cursor:pointer;font-size:.72rem;padding:0 0.5rem 0 0;opacity:0;transition:opacity .12s;flex-shrink:0;';
+          del.textContent = '✕';
+          del.addEventListener('click', () => { proj.steps.splice(realIdx,1); save(); renderProjSteps(); });
+
+          const drag = document.createElement('span');
+          drag.style.cssText = 'color:var(--muted);opacity:0;cursor:grab;font-size:.75rem;padding-right:.2rem;user-select:none;transition:opacity .12s;flex-shrink:0;width:14px;display:inline-block;';
+          drag.textContent = '⠿';
+
+          div.style.cssText = div.style.cssText + 'padding-right:0.5rem;min-height:1.6rem;';
+          div.addEventListener('mouseenter', () => { del.style.opacity='1'; addSubBtn.style.opacity='1'; drag.style.opacity='0.5'; });
+          div.addEventListener('mouseleave', () => { del.style.opacity='0'; addSubBtn.style.opacity='0'; drag.style.opacity='0'; });
+
+          div.appendChild(drag); div.appendChild(chk); div.appendChild(txt); div.appendChild(addSubBtn); div.appendChild(del);
+          wrapper.appendChild(div);
+
+          // Sub-steps
+          const subList = document.createElement('div');
+          subList.style.cssText = 'margin-left:2.8rem;display:flex;flex-direction:column;gap:0.2rem;margin-top:0.3rem;';
+
+          function renderSubSteps() {
+            subList.innerHTML = '';
+            (s.substeps || []).forEach((ss, ssi) => {
+              const row = document.createElement('div');
+              row.style.cssText = 'display:flex;align-items:center;gap:0.35rem;font-size:0.78rem;padding:0.15rem 0;';
+
+              const sChk = document.createElement('div');
+              sChk.style.cssText = `width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.58rem;flex-shrink:0;transition:all .12s;${ss.done?'background:var(--accent);border-color:var(--accent);color:#fff;':''}`;
+              sChk.innerHTML = ss.done ? '&#10003;' : '';
+              sChk.addEventListener('click', () => { ss.done = !ss.done; save(); renderSubSteps(); });
+
+              const sTxt = document.createElement('input');
+              sTxt.type = 'text';
+              sTxt.value = ss.text;
+              sTxt.style.cssText = 'flex:1;background:none;border:none;outline:none;font-size:.78rem;color:var(--text);cursor:text;' + (ss.done ? 'text-decoration:line-through;color:var(--muted);' : '');
+              sTxt.addEventListener('change', () => {
+                const v = sTxt.value.trim();
+                if (!v) { s.substeps.splice(ssi, 1); save(); renderSubSteps(); return; }
+                ss.text = v; save();
+              });
+
+              row.appendChild(sChk); row.appendChild(sTxt);
+              subList.appendChild(row);
+            });
+
+            // Inline add sub-step form (hidden until + sub clicked)
+            if (subList._addFormOpen) {
+              const addRow = document.createElement('div');
+              addRow.style.cssText = 'display:flex;gap:.3rem;margin-top:.2rem;';
+              const inp = document.createElement('input');
+              inp.type = 'text'; inp.placeholder = 'Sub-step...';
+              inp.style.cssText = 'flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;padding:.2rem .45rem;font-size:.75rem;color:var(--text);outline:none;';
+              const okBtn = document.createElement('button');
+              okBtn.className = 'btn-sm'; okBtn.textContent = 'Add';
+              okBtn.style.fontSize = '.72rem';
+              const doAdd = () => {
+                const v = inp.value.trim(); if (!v) return;
+                if (!s.substeps) s.substeps = [];
+                s.substeps.push({ text: v, done: false });
+                subList._addFormOpen = false;
+                save(); renderSubSteps();
+              };
+              okBtn.addEventListener('click', doAdd);
+              inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doAdd(); } });
+              addRow.appendChild(inp); addRow.appendChild(okBtn);
+              subList.appendChild(addRow);
+              setTimeout(() => inp.focus(), 0);
+            }
+          }
+          renderSubSteps();
+          wrapper.appendChild(subList);
+
+          addSubBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            subList._addFormOpen = true;
+            renderSubSteps();
+          });
+
+          stepsDiv.appendChild(wrapper);
         });
       }
       renderProjSteps();
-      detailTd.appendChild(stepsDiv);
 
-      // Add step
+      // Add step input
       const addStepRow = document.createElement('div');
-      addStepRow.style.cssText = 'display:flex;gap:.4rem;margin-top:.3rem;';
+      addStepRow.style.cssText = 'display:flex;gap:.4rem;';
       const stepInp = document.createElement('input');
       stepInp.type = 'text'; stepInp.placeholder = 'Add a step...';
-      stepInp.style.cssText = 'flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:.32rem .6rem;font-size:.8rem;color:var(--text);outline:none;';
+      stepInp.style.cssText = 'flex:1;background:rgba(22,62,34,0.95);border:none;border-radius:6px;padding:.32rem .6rem;font-size:.8rem;color:var(--text);outline:none;';
       const addStepBtn = document.createElement('button');
       addStepBtn.className = 'btn-sm';
       addStepBtn.textContent = 'Add Step';
@@ -2093,13 +2215,20 @@
         const v = stepInp.value.trim();
         if (!v) return;
         if (!proj.steps) proj.steps = [];
-        proj.steps.push({ text: v, done: false });
+        proj.steps.push({ text: v, done: false, substeps: [] });
         save(); stepInp.value = ''; renderProjSteps();
       };
       addStepBtn.addEventListener('click', doAddStep);
       stepInp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doAddStep(); } });
       addStepRow.appendChild(stepInp); addStepRow.appendChild(addStepBtn);
-      detailTd.appendChild(addStepRow);
+
+      rightCol.appendChild(stepsLbl);
+      rightCol.appendChild(stepsDiv);
+      rightCol.appendChild(addStepRow);
+
+      layout.appendChild(leftCol);
+      layout.appendChild(rightCol);
+      detailTd.appendChild(layout);
 
       detailTr.appendChild(detailTd);
 

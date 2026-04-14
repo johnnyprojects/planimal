@@ -844,6 +844,8 @@
     .expand-btn {
       background: none; border: none; color: var(--muted);
       cursor: pointer; font-size: 0.75rem; transition: transform 0.15s;
+      display: block; margin: 0 auto; padding: 0;
+      line-height: 1;
     }
 
     .project-detail-row { display: none; }
@@ -878,6 +880,200 @@
     }
 
     .btn-sm:hover { background: var(--accent); border-color: var(--accent); }
+
+    /* ── TIMELINE / BOX-WHISKER CHART ───────── */
+    .gantt-wrap {
+      margin-top: 1.8rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(10,28,16,0.55);
+    }
+
+    .gantt-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 1rem 0.55rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(18,52,28,0.70);
+    }
+
+    .gantt-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.55px;
+      color: var(--muted);
+    }
+
+    .gantt-legend {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .gantt-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .gantt-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+    }
+
+    .gantt-months-row {
+      display: flex;
+      border-bottom: 1px solid rgba(74,170,104,0.25);
+    }
+
+    .gantt-row-label-head {
+      width: 140px;
+      flex-shrink: 0;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.67rem;
+      color: var(--muted);
+      border-right: 1px solid rgba(74,170,104,0.18);
+    }
+
+    .gantt-month-head {
+      flex: 1;
+      text-align: center;
+      padding: 0.4rem 0.2rem;
+      font-size: 0.67rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--muted);
+      border-right: 1px solid rgba(74,170,104,0.12);
+    }
+
+    .gantt-month-head:last-child { border-right: none; }
+
+    .gantt-project-row {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(74,170,104,0.12);
+      min-height: 40px;
+    }
+
+    .gantt-project-row:last-child { border-bottom: none; }
+
+    .gantt-row-label {
+      width: 140px;
+      flex-shrink: 0;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.78rem;
+      color: var(--text);
+      border-right: 1px solid rgba(74,170,104,0.18);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .gantt-timeline {
+      flex: 1;
+      position: relative;
+      height: 40px;
+    }
+
+    .gantt-bar-track {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 14px;
+      border-radius: 4px;
+      overflow: hidden;
+      min-width: 4px;
+    }
+
+    .gantt-bar-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      border-radius: 4px;
+      opacity: 0.45;
+    }
+
+    .gantt-month-divider {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: rgba(74,170,104,0.10);
+    }
+
+    .gantt-today-line {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: rgba(40,224,112,0.45);
+      z-index: 2;
+    }
+
+    .gantt-today-line::before {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: -3px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .gantt-empty {
+      padding: 1.2rem 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ── PHASE DATES in detail row ───────────── */
+    .phase-dates-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+
+    .phase-date-col {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      padding: 0.45rem 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .phase-date-col-label {
+      font-size: 0.64rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .phase-date-row {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .phase-date-row input[type=date] {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 0.72rem;
+      cursor: pointer;
+      width: 100%;
+      outline: none;
+    }
 
     /* ── CONFIRM MODAL ───────────────────────── */
     .modal-overlay {
@@ -1092,16 +1288,34 @@
         <div class="section-sub">Track long-term work with phases, steps, and progress.</div>
       </div>
       <div class="projects-body">
-        <form class="add-project-form" id="add-project-form">
-          <input type="text" id="new-project-input" placeholder="Add a new project..." />
-          <button class="btn-add" type="submit">+</button>
-        </form>
-        <table class="projects-table">
+        <div style="margin-bottom:1.4rem;">
+          <button class="btn-add" id="add-project-btn" type="button" style="font-size:0.88rem;padding:0.45rem 1.1rem;display:inline-flex;align-items:center;gap:0.5rem;">
+            <span style="font-size:1.1rem;line-height:1;">+</span>
+            <span style="border-left:1px solid rgba(255,255,255,0.3);padding-left:0.5rem;">Add New Project</span>
+          </button>
+        </div>
+        <!-- Gantt Chart -->
+        <div class="gantt-wrap" id="gantt-wrap">
+          <div class="gantt-header-bar">
+            <span class="gantt-title">Timeline &mdash; 6-Month View</span>
+            <div class="gantt-legend">
+              <span class="gantt-legend-item"><span class="gantt-legend-dot" style="background:var(--warning)"></span>Planning</span>
+              <span class="gantt-legend-item"><span class="gantt-legend-dot" style="background:var(--accent-light)"></span>In Progress</span>
+              <span class="gantt-legend-item"><span class="gantt-legend-dot" style="background:#7a9fd4"></span>Review</span>
+              <span class="gantt-legend-item"><span class="gantt-legend-dot" style="background:var(--muted)"></span>Complete</span>
+            </div>
+          </div>
+          <div id="gantt-chart"></div>
+        </div>
+
+        <table class="projects-table" style="margin-top:1.8rem;">
           <thead>
             <tr>
+              <th style="width:18px;"></th>
               <th style="width:28px;"></th>
               <th>Project</th>
-              <th>Phase</th>
+              <th>Category</th>
+              <th>Status</th>
               <th>Start</th>
               <th>End</th>
               <th style="width:100px;">Progress</th>
@@ -1131,6 +1345,56 @@
     <div class="repeat-popover-actions">
       <button type="button" class="repeat-clear-btn" id="repeat-clear-btn">Clear</button>
       <button type="button" class="repeat-done-btn" id="repeat-done-btn">Done</button>
+    </div>
+  </div>
+
+  <!-- Add Project Dialog -->
+  <div class="modal-overlay" id="add-project-modal">
+    <div class="modal-box" style="min-width:480px;max-width:560px;gap:0.9rem;">
+      <div class="modal-title">New Project</div>
+      <div style="display:flex;flex-direction:column;gap:0.7rem;">
+        <div>
+          <label style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:.3rem;">Name</label>
+          <input id="new-project-input" type="text" placeholder="Project name..." maxlength="30"
+            style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:0.5rem 0.8rem;font-size:0.88rem;color:var(--text);outline:none;box-sizing:border-box;" />
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;">
+          <div>
+            <label style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:.3rem;">Start Date</label>
+            <input id="np-start" type="date"
+              style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:0.5rem 0.8rem;font-size:0.86rem;color:var(--text);outline:none;box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:.3rem;">End Date</label>
+            <input id="np-end" type="date"
+              style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:0.5rem 0.8rem;font-size:0.86rem;color:var(--text);outline:none;box-sizing:border-box;" />
+          </div>
+        </div>
+        <div>
+          <label style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:.3rem;">Status</label>
+          <select id="np-phase"
+            style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:0.5rem 0.8rem;font-size:0.86rem;color:var(--text);outline:none;box-sizing:border-box;">
+            <option value="planning">Planning</option>
+            <option value="in-progress">In Progress</option>
+            <option value="review">Review</option>
+            <option value="complete">Complete</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:.3rem;">Category</label>
+          <input id="np-category" type="text" placeholder="e.g. Marketing, Engineering..."
+            style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:0.5rem 0.8rem;font-size:0.86rem;color:var(--text);outline:none;box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:.3rem;">Description</label>
+          <textarea id="np-desc" placeholder="Project description..."
+            style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:0.5rem 0.8rem;font-size:0.86rem;color:var(--text);outline:none;resize:vertical;min-height:80px;font-family:inherit;box-sizing:border-box;"></textarea>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="add-project-cancel">Cancel</button>
+        <button class="modal-confirm" id="add-project-confirm" style="background:var(--accent);">Add Project</button>
+      </div>
     </div>
   </div>
 
@@ -1931,21 +2195,78 @@
     }
     emptyEl.style.display = 'none';
 
+    let dragSrcIdx = null;
+
     state.projects.forEach((proj, i) => {
       // ── Main row ──
       const tr = document.createElement('tr');
       tr.className = 'project-row';
+      tr.draggable = true;
+      tr.dataset.idx = i;
+
+      tr.addEventListener('dragstart', e => {
+        dragSrcIdx = i;
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => tr.style.opacity = '0.4', 0);
+      });
+      tr.addEventListener('dragend', () => { tr.style.opacity = ''; });
+      tr.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; tr.style.outline = '2px solid var(--accent)'; });
+      tr.addEventListener('dragleave', () => { tr.style.outline = ''; });
+      tr.addEventListener('drop', e => {
+        e.preventDefault();
+        tr.style.outline = '';
+        if (dragSrcIdx === null || dragSrcIdx === i) return;
+        const moved = state.projects.splice(dragSrcIdx, 1)[0];
+        state.projects.splice(i, 0, moved);
+        dragSrcIdx = null;
+        save(); renderProjects();
+      });
+
+      // Drag handle
+      const tdDrag = document.createElement('td');
+      tdDrag.style.cssText = 'cursor:grab;color:var(--muted);font-size:0.85rem;padding:0;user-select:none;vertical-align:middle;text-align:center;width:18px;';
+      tdDrag.textContent = '⠿';
+      tdDrag.title = 'Drag to reorder';
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'expand-btn';
       expandBtn.innerHTML = '&#9654;';
 
       const tdExpand = document.createElement('td');
+      tdExpand.style.cssText = 'vertical-align:middle;text-align:center;padding:0;width:28px;';
       tdExpand.appendChild(expandBtn);
 
       const tdName = document.createElement('td');
-      tdName.style.fontWeight = '500';
-      tdName.textContent = proj.name;
+      tdName.style.cssText = 'font-weight:500;cursor:text;';
+
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = proj.name;
+      nameSpan.style.cssText = 'display:inline-block;min-width:60px;';
+
+      nameSpan.addEventListener('click', e => {
+        e.stopPropagation();
+        const inp = document.createElement('input');
+        inp.value = proj.name;
+        inp.maxLength = 30;
+        inp.style.cssText = 'background:transparent;border:none;border-bottom:1.5px solid var(--accent);color:var(--text);font-size:inherit;font-weight:500;font-family:inherit;outline:none;width:100%;min-width:80px;padding:0;';
+        tdName.replaceChild(inp, nameSpan);
+        inp.focus();
+        inp.select();
+        const commit = () => {
+          const val = inp.value.trim();
+          if (val) proj.name = val;
+          nameSpan.textContent = proj.name;
+          tdName.replaceChild(nameSpan, inp);
+          save();
+        };
+        inp.addEventListener('blur', commit);
+        inp.addEventListener('keydown', e2 => {
+          if (e2.key === 'Enter') { e2.preventDefault(); inp.blur(); }
+          if (e2.key === 'Escape') { inp.value = proj.name; inp.blur(); }
+        });
+      });
+
+      tdName.appendChild(nameSpan);
 
       const tdPhase = document.createElement('td');
       const phaseBadge = document.createElement('span');
@@ -1953,19 +2274,17 @@
       phaseBadge.textContent = phaseLabel(proj.phase);
       tdPhase.appendChild(phaseBadge);
 
+      const tdCat = document.createElement('td');
+      tdCat.style.cssText = 'font-size:.82rem;color:var(--muted);';
+      tdCat.textContent = proj.category || '—';
+
       const tdStart = document.createElement('td');
-      const startInp = document.createElement('input');
-      startInp.type = 'date'; startInp.value = proj.start || '';
-      startInp.style.cssText = 'background:transparent;border:none;color:var(--text);font-size:.84rem;cursor:pointer;';
-      startInp.addEventListener('change', () => { proj.start = startInp.value; save(); });
-      tdStart.appendChild(startInp);
+      tdStart.style.cssText = 'font-size:.84rem;color:var(--muted);';
+      tdStart.textContent = proj.start || '—';
 
       const tdEnd = document.createElement('td');
-      const endInp = document.createElement('input');
-      endInp.type = 'date'; endInp.value = proj.end || '';
-      endInp.style.cssText = 'background:transparent;border:none;color:var(--text);font-size:.84rem;cursor:pointer;';
-      endInp.addEventListener('change', () => { proj.end = endInp.value; save(); });
-      tdEnd.appendChild(endInp);
+      tdEnd.style.cssText = 'font-size:.84rem;color:var(--muted);';
+      tdEnd.textContent = proj.end || '—';
 
       const tdProgress = document.createElement('td');
       const progBar = document.createElement('div');
@@ -1991,22 +2310,22 @@
       });
       tdDel.appendChild(delBtn);
 
-      tr.appendChild(tdExpand); tr.appendChild(tdName); tr.appendChild(tdPhase);
-      tr.appendChild(tdStart);  tr.appendChild(tdEnd);  tr.appendChild(tdProgress);
-      tr.appendChild(tdDel);
+      tr.appendChild(tdDrag); tr.appendChild(tdExpand); tr.appendChild(tdName); tr.appendChild(tdCat);
+      tr.appendChild(tdPhase);  tr.appendChild(tdStart); tr.appendChild(tdEnd);
+      tr.appendChild(tdProgress); tr.appendChild(tdDel);
 
       // ── Detail row ──
       const detailTr = document.createElement('tr');
       detailTr.className = 'project-detail-row';
       const detailTd = document.createElement('td');
       detailTd.className = 'project-detail-cell';
-      detailTd.colSpan = 7;
+      detailTd.colSpan = 9;
 
       // Two-column layout
       const layout = document.createElement('div');
       layout.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;';
 
-      // ── LEFT: description + controls ──
+      // ── LEFT: description + status + progress ──
       const leftCol = document.createElement('div');
       leftCol.style.cssText = 'display:flex;flex-direction:column;gap:0.75rem;';
 
@@ -2021,7 +2340,7 @@
 
       const phaseLbl2 = document.createElement('div');
       phaseLbl2.style.cssText = 'font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);';
-      phaseLbl2.textContent = 'Phase';
+      phaseLbl2.textContent = 'Status';
       const phaseSelect = document.createElement('select');
       phaseSelect.style.cssText = 'background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:.32rem .6rem;font-size:.84rem;color:var(--text);outline:none;width:100%;';
       ['planning','in-progress','review','complete'].forEach(p => {
@@ -2040,20 +2359,71 @@
       const progInp = document.createElement('input');
       progInp.type = 'range'; progInp.min = 0; progInp.max = 100;
       progInp.value = proj.progress || 0;
-      progInp.style.cssText = 'width:50%;accent-color:var(--accent);';
+      progInp.style.cssText = 'width:60%;accent-color:var(--accent);';
       const progVal = document.createElement('span');
       progVal.style.cssText = 'font-size:.82rem;color:var(--muted);min-width:36px;text-align:right;';
       progVal.textContent = (proj.progress||0) + '%';
+      let completeTimer = null;
       progInp.addEventListener('input', () => {
         proj.progress = parseInt(progInp.value);
         progVal.textContent = proj.progress + '%';
         progFill.style.width = proj.progress + '%';
         progPct.textContent = proj.progress + '%';
-        save();
+        save(); renderGantt();
+
+        clearTimeout(completeTimer);
+        if (proj.progress === 100 && proj.phase !== 'complete') {
+          progVal.textContent = '100% ✓';
+          completeTimer = setTimeout(() => {
+            if (proj.progress === 100) {
+              proj.phase = 'complete';
+              save(); renderProjects();
+            }
+          }, 5000);
+        }
       });
       progRow.appendChild(progInp); progRow.appendChild(progVal);
 
+      // Category
+      const catLbl = document.createElement('div');
+      catLbl.style.cssText = 'font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);';
+      catLbl.textContent = 'Category';
+      const catInp = document.createElement('input');
+      catInp.type = 'text';
+      catInp.value = proj.category || '';
+      catInp.placeholder = 'e.g. Marketing, Engineering...';
+      catInp.style.cssText = 'width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:.38rem .6rem;font-size:.84rem;color:var(--text);outline:none;box-sizing:border-box;';
+      catInp.addEventListener('change', () => { proj.category = catInp.value.trim(); tdCat.textContent = proj.category || '—'; save(); });
+
+      // Start / End dates
+      const datesRow = document.createElement('div');
+      datesRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;';
+
+      const startWrap = document.createElement('div');
+      const startLbl2 = document.createElement('div');
+      startLbl2.style.cssText = 'font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);margin-bottom:.25rem;';
+      startLbl2.textContent = 'Start Date';
+      const startInp = document.createElement('input');
+      startInp.type = 'date'; startInp.value = proj.start || '';
+      startInp.style.cssText = 'width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:.38rem .6rem;font-size:.84rem;color:var(--text);outline:none;box-sizing:border-box;';
+      startInp.addEventListener('change', () => { proj.start = startInp.value; tdStart.textContent = proj.start || '—'; save(); renderGantt(); });
+      startWrap.appendChild(startLbl2); startWrap.appendChild(startInp);
+
+      const endWrap = document.createElement('div');
+      const endLbl2 = document.createElement('div');
+      endLbl2.style.cssText = 'font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);margin-bottom:.25rem;';
+      endLbl2.textContent = 'End Date';
+      const endInp = document.createElement('input');
+      endInp.type = 'date'; endInp.value = proj.end || '';
+      endInp.style.cssText = 'width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:.38rem .6rem;font-size:.84rem;color:var(--text);outline:none;box-sizing:border-box;';
+      endInp.addEventListener('change', () => { proj.end = endInp.value; tdEnd.textContent = proj.end || '—'; save(); renderGantt(); });
+      endWrap.appendChild(endLbl2); endWrap.appendChild(endInp);
+
+      datesRow.appendChild(startWrap); datesRow.appendChild(endWrap);
+
       leftCol.appendChild(descLbl); leftCol.appendChild(descTA);
+      leftCol.appendChild(datesRow);
+      leftCol.appendChild(catLbl); leftCol.appendChild(catInp);
       leftCol.appendChild(phaseLbl2); leftCol.appendChild(phaseSelect);
       leftCol.appendChild(progLbl2); leftCol.appendChild(progRow);
 
@@ -2067,7 +2437,7 @@
 
       const stepsDiv = document.createElement('div');
       stepsDiv.className = 'project-steps';
-      stepsDiv.style.cssText = 'max-height:220px;overflow-y:auto;border:1.5px solid var(--border);border-radius:7px;padding:0.4rem 0.5rem;';
+      stepsDiv.style.cssText = 'height:220px;overflow-y:auto;border:1.5px solid var(--border);border-radius:7px;padding:0.4rem 0.5rem;box-sizing:border-box;';
 
       function renderProjSteps() {
         stepsDiv.innerHTML = '';
@@ -2234,23 +2604,188 @@
 
       expandBtn.addEventListener('click', e => {
         e.stopPropagation();
-        const open = detailTr.classList.toggle('open');
-        expandBtn.style.transform = open ? 'rotate(90deg)' : '';
+        const isOpen = detailTr.classList.contains('open');
+        // Close all open detail rows first
+        tbody.querySelectorAll('.project-detail-row.open').forEach(r => r.classList.remove('open'));
+        tbody.querySelectorAll('.expand-btn').forEach(b => b.style.transform = '');
+        // Toggle this one open if it wasn't already
+        if (!isOpen) {
+          detailTr.classList.add('open');
+          expandBtn.style.transform = 'rotate(90deg)';
+        }
       });
 
       tbody.appendChild(tr);
       tbody.appendChild(detailTr);
     });
+
+    renderGantt();
   }
 
-  document.getElementById('add-project-form').addEventListener('submit', e => {
-    e.preventDefault();
-    const inp = document.getElementById('new-project-input');
-    const name = inp.value.trim();
+  // ================================================================
+  //  GANTT CHART
+  // ================================================================
+  function renderGantt() {
+    const container = document.getElementById('gantt-chart');
+    container.innerHTML = '';
+
+    if (!state.projects.length) {
+      const empty = document.createElement('div');
+      empty.className = 'gantt-empty';
+      empty.textContent = 'No projects yet — add one above.';
+      container.appendChild(empty);
+      return;
+    }
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const winStart = new Date(today.getFullYear(), today.getMonth() - 3, 1);
+    const winEnd   = new Date(today.getFullYear(), today.getMonth() + 4, 0);
+    const totalMs  = winEnd - winStart;
+
+    const months = [];
+    let cur = new Date(winStart);
+    while (cur <= winEnd) {
+      months.push(new Date(cur.getFullYear(), cur.getMonth(), 1));
+      cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+    }
+
+    const phaseColors = {
+      'planning':    'var(--warning)',
+      'in-progress': 'var(--accent-light)',
+      'review':      '#7a9fd4',
+      'complete':    'var(--muted)',
+    };
+
+    // Header row
+    const headerRow = document.createElement('div');
+    headerRow.className = 'gantt-months-row';
+    const corner = document.createElement('div');
+    corner.className = 'gantt-row-label-head';
+    corner.textContent = 'Project';
+    headerRow.appendChild(corner);
+    months.forEach(m => {
+      const cell = document.createElement('div');
+      cell.className = 'gantt-month-head';
+      cell.textContent = m.toLocaleString('default', { month: 'short', year: '2-digit' });
+      headerRow.appendChild(cell);
+    });
+    container.appendChild(headerRow);
+
+    // Project rows
+    state.projects.forEach(proj => {
+      const row = document.createElement('div');
+      row.className = 'gantt-project-row';
+
+      const label = document.createElement('div');
+      label.className = 'gantt-row-label';
+      label.title = proj.name;
+      label.textContent = proj.name;
+      row.appendChild(label);
+
+      const timeline = document.createElement('div');
+      timeline.className = 'gantt-timeline';
+
+      // Month dividers
+      months.forEach((m, idx) => {
+        if (idx === 0) return;
+        const divEl = document.createElement('div');
+        divEl.className = 'gantt-month-divider';
+        divEl.style.left = ((m - winStart) / totalMs * 100) + '%';
+        timeline.appendChild(divEl);
+      });
+
+      // Today line
+      const tf = (today - winStart) / totalMs;
+      if (tf >= 0 && tf <= 1) {
+        const tl = document.createElement('div');
+        tl.className = 'gantt-today-line';
+        tl.style.left = (tf * 100) + '%';
+        timeline.appendChild(tl);
+      }
+
+      // Box-and-whisker (only if start date set)
+      if (proj.start) {
+        const barStart = new Date(proj.start + 'T00:00:00');
+        const barEnd   = proj.end ? new Date(proj.end + 'T00:00:00') : today;
+        const cs = Math.max(barStart - winStart, 0);
+        const ce = Math.min(barEnd   - winStart, totalMs);
+
+        if (ce > cs) {
+          const isOverdue = proj.phase !== 'complete' && barEnd < today;
+          const color = isOverdue ? '#ff6b6b' : (phaseColors[proj.phase] || 'var(--muted)');
+          const span  = ce - cs;
+
+          const l  = (cs / totalMs) * 100;               // start %
+          const q1 = ((cs + span * 0.25) / totalMs) * 100;
+          const q2 = ((cs + span * 0.50) / totalMs) * 100;
+          const q3 = ((cs + span * 0.75) / totalMs) * 100;
+          const r  = (ce / totalMs) * 100;               // end %
+
+          const mk = (left, width, height, extra = '') => {
+            const el = document.createElement('div');
+            el.style.cssText = `position:absolute;top:50%;transform:translateY(-50%);left:${left}%;width:${width}%;height:${height}px;background:${color};${extra}`;
+            timeline.appendChild(el);
+          };
+
+          // Left whisker line
+          mk(l, q1 - l, 2, 'opacity:0.7;');
+          // Left cap
+          mk(l, 0.15, 12, 'opacity:0.9;border-radius:1px;');
+          // Box (Q1–Q3)
+          mk(q1, q3 - q1, 14, 'opacity:0.82;border-radius:3px;');
+          // Median line
+          mk(q2 - 0.1, 0.2, 20, 'opacity:1;border-radius:1px;background:#fff;');
+          // Right whisker line
+          mk(q3, r - q3, 2, 'opacity:0.7;');
+          // Right cap
+          mk(r - 0.15, 0.15, 12, 'opacity:0.9;border-radius:1px;');
+        }
+      }
+
+      row.appendChild(timeline);
+      container.appendChild(row);
+    });
+  }
+
+  const addProjModal  = document.getElementById('add-project-modal');
+  const addProjInput  = document.getElementById('new-project-input');
+
+  function openAddProjectModal() {
+    addProjInput.value = '';
+    document.getElementById('np-category').value = '';
+    document.getElementById('np-start').value   = '';
+    document.getElementById('np-end').value     = '';
+    document.getElementById('np-phase').value   = 'planning';
+    document.getElementById('np-desc').value    = '';
+    addProjModal.classList.add('open');
+    setTimeout(() => addProjInput.focus(), 50);
+  }
+
+  function closeAddProjectModal() {
+    addProjModal.classList.remove('open');
+  }
+
+  function submitAddProject() {
+    const name = addProjInput.value.trim();
     if (!name) return;
-    state.projects.push({ id: Date.now(), name, phase: 'planning', start:'', end:'', progress: 0, desc:'', steps:[] });
-    save(); inp.value = ''; renderProjects();
-  });
+    state.projects.push({
+      id: Date.now(), name,
+      category: document.getElementById('np-category').value.trim(),
+      phase:    document.getElementById('np-phase').value,
+      start:    document.getElementById('np-start').value,
+      end:      document.getElementById('np-end').value,
+      desc:     document.getElementById('np-desc').value.trim(),
+      progress: 0, steps: []
+    });
+    save(); renderProjects();
+    closeAddProjectModal();
+  }
+
+  document.getElementById('add-project-btn').addEventListener('click', openAddProjectModal);
+  document.getElementById('add-project-confirm').addEventListener('click', submitAddProject);
+  document.getElementById('add-project-cancel').addEventListener('click', closeAddProjectModal);
+  addProjInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitAddProject(); if (e.key === 'Escape') closeAddProjectModal(); });
+  addProjModal.addEventListener('click', e => { if (e.target === addProjModal) closeAddProjectModal(); });
 
   // ================================================================
   //  HELPERS

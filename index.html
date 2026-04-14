@@ -1297,7 +1297,7 @@
         <!-- Gantt Chart -->
         <div class="gantt-wrap" id="gantt-wrap">
           <div class="gantt-header-bar">
-            <span class="gantt-title">Timeline &mdash; 6-Month View</span>
+            <span class="gantt-title">Timeline</span>
             <div class="gantt-legend">
               <span class="gantt-legend-item"><span class="gantt-legend-dot" style="background:var(--warning)"></span>Planning</span>
               <span class="gantt-legend-item"><span class="gantt-legend-dot" style="background:var(--accent-light)"></span>In Progress</span>
@@ -2671,6 +2671,10 @@
     });
     container.appendChild(headerRow);
 
+    // Scrollable rows container (max 5 rows visible)
+    const rowsWrap = document.createElement('div');
+    rowsWrap.style.cssText = 'max-height:200px;overflow-y:auto;';
+
     // Project rows
     state.projects.forEach(proj => {
       const row = document.createElement('div');
@@ -2743,8 +2747,10 @@
       }
 
       row.appendChild(timeline);
-      container.appendChild(row);
+      rowsWrap.appendChild(row);
     });
+
+    container.appendChild(rowsWrap);
   }
 
   const addProjModal  = document.getElementById('add-project-modal');
